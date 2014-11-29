@@ -10,3 +10,9 @@ github_username:  saminiir
 
 # Build settings
 markdown: kramdown
+
+navigation:
+  - title: Home
+    url: /index.html
+  - title: About
+    url: /about.html
