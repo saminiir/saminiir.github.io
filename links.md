@@ -11,3 +11,4 @@ This page contains links to articles, papers and blog posts I've found insightfu
 - [Smashing The Stack For Fun And Profit](http://phrack.org/issues/49/14.html)
 - [On µ-Kernel Construction](http://www.eecs.harvard.edu/cs261/papers/liedtke95.pdf)
 - [QEMU, a Fast and Portable Dynamic Translator](https://www.usenix.org/legacy/event/usenix05/tech/freenix/full_papers/bellard/bellard.pdf)
+- [The Lost Art of C Structure Packing](http://www.catb.org/esr/structure-packing/)
