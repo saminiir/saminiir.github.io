@@ -13,3 +13,4 @@ This page contains links to articles, papers and blog posts I've found insightfu
 - [QEMU, a Fast and Portable Dynamic Translator](https://www.usenix.org/legacy/event/usenix05/tech/freenix/full_papers/bellard/bellard.pdf)
 - [The Lost Art of C Structure Packing](http://www.catb.org/esr/structure-packing/)
 - [Unikernels: Rise of the Virtual Library Operating System](https://queue.acm.org/detail.cfm?id=2566628)
+- [Why ML/OCaml are good for writing compilers](http://flint.cs.yale.edu/cs421/case-for-ml.html)
