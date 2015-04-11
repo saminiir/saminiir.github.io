@@ -14,3 +14,4 @@ This page contains links to articles, papers and blog posts I've found insightfu
 - [The Lost Art of C Structure Packing](http://www.catb.org/esr/structure-packing/)
 - [Unikernels: Rise of the Virtual Library Operating System](https://queue.acm.org/detail.cfm?id=2566628)
 - [Why ML/OCaml are good for writing compilers](http://flint.cs.yale.edu/cs421/case-for-ml.html)
+- [A Unified Theory of Garbage Collection](http://www.cs.virginia.edu/~cs415/reading/bacon-garbage.pdf)
