@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Customize dwm on Fedora"
-date:   2015-12-25 20:00:00
+date:   2015-12-25 17:00:00
 categories: fedora
 permalink: customize-dwm-on-fedora
 ---
