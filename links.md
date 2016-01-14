@@ -17,3 +17,4 @@ This page contains links to articles, papers and blog posts I've found insightfu
 - [A Unified Theory of Garbage Collection](http://www.cs.virginia.edu/~cs415/reading/bacon-garbage.pdf)
 - [OCaml for the Masses](https://queue.acm.org/detail.cfm?id=2038036)
 - [Scaling in the Linux Networking Stack](https://www.kernel.org/doc/Documentation/networking/scaling.txt)
+- [Embracing Conway's Law](https://wingolog.org/archives/2015/11/09/embracing-conways-law)
