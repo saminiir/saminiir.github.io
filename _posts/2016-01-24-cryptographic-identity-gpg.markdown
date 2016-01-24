@@ -4,6 +4,7 @@ title:  "Establish your online identity using GnuPG"
 date:   2016-01-24 19:00:00
 categories: cryptography
 permalink: establish-cryptographic-identity-using-gnupg
+comments: false
 ---
 
 _DISCLAIMER: This article is a work-in-progress. I will update it when I have more experience with PGP keys and cryptography in general._
