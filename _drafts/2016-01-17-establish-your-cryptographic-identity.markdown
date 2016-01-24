@@ -238,7 +238,7 @@ gpg> expire
 
 Again, you need your master keypair for this operation to succeed.
 
-# Sources
+# Notes
 
 [^1]:<https://en.wikipedia.org/wiki/Public-key_cryptography>
 [^2]:<https://en.wikipedia.org/wiki/GNU_Privacy_Guard>
