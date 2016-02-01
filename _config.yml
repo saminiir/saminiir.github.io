@@ -4,7 +4,7 @@ email: saminiir@gmail.com
 description: > # this means to ignore newlines until "baseurl:"
     Yet Another Hacker Blog (YAHB). UNIX, Networking, Self-Improvement.
 #baseurl: # the subpath of your site, e.g. /blog/
-url: "http://www.saminiir.com" # the base hostname & protocol for your site
+url: "https://www.saminiir.com" # the base hostname & protocol for your site
 twitter_username: saminiir
 github_username:  saminiir
 
