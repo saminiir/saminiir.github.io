@@ -1,9 +1,9 @@
 ---
 layout: post
 title:  "OpenVPN puts packets inside your packets"
-date:   2016-01-30 08:00:00
+date:   2016-02-20 09:00:00
 categories: networking
-permalink: how-does-openvpn-work
+permalink: openvpn-puts-packets-inside-your-packets
 ---
 
 I realized I do not know exactly *how* OpenVPN does its magic in Linux.
@@ -39,17 +39,17 @@ _Tunneling, generally speaking, is the idea of carrying lower-layer traffic in h
 
 In other words, tunneling is achieved by injecting packets into the payload of other packets. Reminds me of [a certain meme](http://www.urbandictionary.com/define.php?term=Yo+Dawg).
 
-Various protocols for establishing tunnels exist, the prominent ones being _Generic Routing Encapsulation_ (GRE), Microsoft's _Point-to-Point Tunneling Protoco_ (PPTP) and the _Layer 2 Tunneling Protocol_ (L2TP).
+Various protocols for establishing tunnels exist, the prominent ones being _Generic Routing Encapsulation_ (GRE), Microsoft's _Point-to-Point Tunneling Protocol_ (PPTP) and the _Layer 2 Tunneling Protocol_ (L2TP).
 
-The net result is that virtual links between computers in different networks can be set up. An example of this is a company's private network, which can be reached from the public network via tunneling.
+The result is that virtual links between computers in different networks can be set up. An example of this is a company's private network, which can be reached from the public network via tunneling.
 
 Note, however, that tunneling itself does not guarantee secure communications. Encryption has to be applied to the payload, assuming you've succeeded to exchange cryptographic keys securely in an insecure environment.
 
 # Encryption
 
-When using tunneling, there's a high chance that the information you transmit is of delicate nature. Hence, cryptographic measures have to be executed to prevent anyone from snooping in the data.
+When using tunneling, there's a high chance that the information you transmit is of delicate nature. Hence, cryptographic measures have to be taken into use to prevent anyone from snooping in the data.
 
-Since OpenVPN is an userspace application, _Transport Layer Security_ (TLS) is a natural choice for the security protocol[^2]. TLS operates in the layers above the networking stack, so implementing it in an application's scope is easier than more involved lower-level protocols that require specific[^swan] kernel modules. If you've ever browsed a https-site, then you have used TLS for authentication and encryption.
+Since OpenVPN is an userspace application, _Transport Layer Security_ (TLS) is a natural choice for the security protocol[^2]. TLS operates in the layers above the networking stack, so implementing it in an application's scope is easier than more involved lower-level protocols that require specific[^swan] kernel modules. If you've ever browsed a site with the protocol HTTPS, then you have used TLS for authentication and encryption.
 
 The basic steps for secure communication are implemented in OpenVPN as follows[^3]:
 
@@ -62,14 +62,13 @@ The X509 Public Key Infrastructure is an ITU-T standard which relies on Certific
 
 The TLS protocol is the ubiquitous privacy protocol suite used to encrypt, well, pretty much anything dealing with Internet. Namely, TLS is responsible of negotiating a secure communication channel between two parties. This mainly consists of certificate and key exchanges, which can be used to authenticate the other party and subsequently encrypt and decrypt the data. 
 
-The key exchange is a fascinating topic as it revolves around the question that how can two parties establish a secure communication channel when the medium they're communicating through is insecure? Turns out, the Diffie-Hellman method (DH)[^dh] is one such clever approach, where two parties can agree upon a key without revealing that key to outsiders.
+The key exchange is a fascinating topic as it revolves around the problem of two parties attempting to establish a secure communication channel in an insecure medium. Turns out, the Diffie-Hellman method (DH)[^dh] is one such clever approach, where two parties can agree upon a key without revealing that key to outsiders.
 
-Another option is to use RSA[^rsa] public key cryptography for the key exchange. Where as DH utilizes finite field arithmetic to achieve secure key exchange, RSA takes advantage of the integer factorization problem. This problem deals with the fact that it is hard to figure out which prime numbers are the product of a number (semiprime).
+Another option is to use RSA[^rsa] public key cryptography for the key exchange. Whereas DH utilizes finite field arithmetic to achieve secure key exchange, RSA takes advantage of the integer factorization problem. This problem deals with the fact that it is hard to factor the numbers that a semiprime number is a product of.
 
-OpenVPN uses the EVP interface[^evp] of the OpenSSL library to abstract upon routine cryptographic functions. It provides encryption/decryption, signing/verifying, key derivation, hash functions and message authentication code (MAC) functions.
+To abstract upon the routine cryptographic functions, OpenVPN uses the EVP interface[^evp] of the OpenSSL library. It provides encryption/decryption, signing/verifying, key derivation, hash functions and message authentication code (MAC) functions.
 
 Lastly, Message Authentication Code (MAC) is an important part of secure communications. It is used to verify message integrity, but also to authenticate the message's origins.
-
 
 # OpenVPN protocol
 
@@ -101,23 +100,21 @@ The _ClientHello_ message is pretty self-explanatory. The client is required to 
 
 The server responds with a ServerHello, Certificate, CertificateRequest TLS records.
 
-The _ServerHello_ record is very much like the ClientHello message, except it has the responsibility of, among other things, choosing the ciphersuite that satisfies both parties' requirements. In my example OpenVPN session, `TLS_RSA_WITH_AES_256_CBC_SHA` was chosen as the ciphersuite. This means that RSA is used for the key exchange.
+The _ServerHello_ record is very much like the ClientHello message, except it has the responsibility of, among other things, choosing the ciphersuite that satisfies both parties' requirements. In my OpenVPN test session, `TLS_RSA_WITH_AES_256_CBC_SHA` was chosen as the ciphersuite. This means that RSA is used for the key exchange.
 
-(I also noticed, that the TLS version chosen was 1.0, first defined in 1999. Time to abandon all hope, I guess.)
+The _Certificate_ record is required whenever the key exchange method is anything other than Anonymous Diffie-Hellman. This is because both parties have to validate the identity of each other to prevent Man-in-the-Middle attacks. Finally, the certificate record contains the certificates of the server..
 
-TODO: Why does the Certificate record miss sometimes?
+The _ServerKeyExchange_ record is only sent when "the server Certificate message (if sent) does not contain enough data to allow the client to exchange a premaster secret." Thus, when using public-key cryptograpghy, you are unlikely to see this message.
 
-The _Certificate_ record is required whenever the key exchange method is something other than anonymous Diffie-Hellman. This is because both parties have to validate the identity of each other to prevent Man-in-the-Middle attacks. _Finally, the certificate record contains the encrypted public keys of both parties_ TODO: Really?.
+The _CertificateRequest_ record sent by the server is followed by the _ServerHelloDone_ message, which indicates to the client that the server has finished its part of the key exchange.
 
-The _ServerKeyExchange_ record is only sent when "the server Certificate message (if sent) does not contain enough data to allow the client to exchange a premaster secret."
+Next, the client sends a _Certificate_ TLS record to the server, containing the client's certificate used for authentication.
 
-The _CertificateRequest_ record is only sent when the ciphersuite requires so.
+The _ClientKeyExchange_ message is always sent next by the client. It contains either the RSA-encrypted secret or Diffie-Hellman parameters for establishing a shared secret between the two parties.
 
+The _CertificateVerify_ message is sent by the client if explicit verification of the client's certificates is needed.
 
-
-Arguably the most important part of the TLS handshaking protocol is the key exchange. This needs to be done so that the application data can be encrypted with a symmetric encryption scheme. The reason why using the already-existing asymmetric encryption (the public and private keys of both parties) is not feasible is performance. Negotiating a shared symmetric key is mandatory for encrypting/decrypting network traffic on-the-go.
-
-Additionally, ephemeral public keys have the advantage of being transient, meaning that encrypted data that is sniffed cannot be decrypted later on because the keys used for the encryption were not stored in the first place.
+Finally, the _Finished_ message is sent by both parties and it is the first encrypted message. Once both parties receive and validate the message, Application Data starts to flow in the encrypted tunnel between the parties. Before the Finished messages, _ChangeCipherSpec_ message is used to indicate any changes in the cipher specifications.
 
 # TUN/TAP devices
 
@@ -126,9 +123,15 @@ The tunneling of data in OpenVPN is achieved through TUN/TAP devices[^4]. Simply
 A TUN device operates on IP packets (layer 3), and a TAP device operates on ethernet frames (layer 2). The distinction is important, since operating on different networking layers enable different use cases. For example, if one wants Ethernet bridging, OpenVPN has to utilize TAP devices. For simple routing of traffic, TUN devices are a cheaper choice. A handy summary of the differences between bridging and routing is presented
 [here](https://community.openvpn.net/openvpn/wiki/309-what-is-the-difference-between-bridging-and-routing).
 
-How do packets get forwarded to/from the TUN/TAP device?
+With OpenVPN and TUN/TAP devices, the Linux Kernel networking stack is involved and does the heavy-lifting of the traffic. The only purpose of the TUN/TAP device is to allow the user-space application, OpenVPN, to operate on the raw Ethernet frames or IP packets. This is where tunneling and encryption is applied. The Ethernet frame or IP packet is encrypted and wrapped inside another IP packet with appropriate headers for delivery, and vice versa.
+
+The specific source code for how the TUN/TAP device is opened in OpenVPN is in the source file [tun.c](https://github.com/OpenVPN/openvpn/blob/v2.3.10/src/openvpn/tun.c#L1504). It closely reflects the [TUN/TAP documentation](https://www.kernel.org/doc/Documentation/networking/tuntap.txt) of the Linux Kernel.
 
 # Conclusion
+
+Implementing secure communications is a fascinating matter but not a trivial one. The fundamental problem is that the Internet as we know it, is an unsecure medium. Anyone can snoop in on the data flowing through different networks, so establishing a secure communication channel is tricky. 
+
+As a bonus, I found out there's a module named [gremlin](https://github.com/OpenVPN/openvpn/blob/v2.3.10/src/openvpn/gremlin.c) in OpenVPN, which can be enabled with the `--gremlin` flag in debug mode. It will wreak havoc on your VPN tunnels, and is probably used to test OpenVPN. :-)
 
 # Sources
 
