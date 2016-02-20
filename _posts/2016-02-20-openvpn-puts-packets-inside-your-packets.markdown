@@ -47,7 +47,7 @@ Note, however, that tunneling itself does not guarantee secure communications. E
 
 # Encryption
 
-When using tunneling, there's a high chance that the information you transmit is of delicate nature. Hence, cryptographic measures have to be taken into use to prevent anyone from snooping in the data.
+When using tunneling, there's a high chance that the information you transmit is of delicate nature. Hence, cryptographic measures have to be taken into use to prevent anyone from snooping in on the data.
 
 Since OpenVPN is an userspace application, _Transport Layer Security_ (TLS) is a natural choice for the security protocol[^2]. TLS operates in the layers above the networking stack, so implementing it in an application's scope is easier than more involved lower-level protocols that require specific[^swan] kernel modules. If you've ever browsed a site with the protocol HTTPS, then you have used TLS for authentication and encryption.
 
@@ -62,7 +62,7 @@ The X509 Public Key Infrastructure is an ITU-T standard which relies on Certific
 
 The TLS protocol is the ubiquitous privacy protocol suite used to encrypt, well, pretty much anything dealing with Internet. Namely, TLS is responsible of negotiating a secure communication channel between two parties. This mainly consists of certificate and key exchanges, which can be used to authenticate the other party and subsequently encrypt and decrypt the data. 
 
-The key exchange is a fascinating topic as it revolves around the problem of two parties attempting to establish a secure communication channel in an insecure medium. Turns out, the Diffie-Hellman method (DH)[^dh] is one such clever approach, where two parties can agree upon a key without revealing that key to outsiders.
+Key exchange is a fascinating topic as it revolves around the problem of two parties attempting to establish a secure communication channel in an insecure medium. Turns out, the Diffie-Hellman method (DH)[^dh] is one such clever approach, where two parties can agree upon a key without revealing that key to outsiders.
 
 Another option is to use RSA[^rsa] public key cryptography for the key exchange. Whereas DH utilizes finite field arithmetic to achieve secure key exchange, RSA takes advantage of the integer factorization problem. This problem deals with the fact that it is hard to factor the numbers that a semiprime number is a product of.
 
@@ -104,7 +104,7 @@ The _ServerHello_ record is very much like the ClientHello message, except it ha
 
 The _Certificate_ record is required whenever the key exchange method is anything other than Anonymous Diffie-Hellman. This is because both parties have to validate the identity of each other to prevent Man-in-the-Middle attacks. Finally, the certificate record contains the certificates of the server..
 
-The _ServerKeyExchange_ record is only sent when "the server Certificate message (if sent) does not contain enough data to allow the client to exchange a premaster secret." Thus, when using public-key cryptograpghy, you are unlikely to see this message.
+The _ServerKeyExchange_ record is only sent when "the server Certificate message (if sent) does not contain enough data to allow the client to exchange a premaster secret."[^tls-spec] Thus, when using public-key cryptograpghy, you are unlikely to see this message.
 
 The _CertificateRequest_ record sent by the server is followed by the _ServerHelloDone_ message, which indicates to the client that the server has finished its part of the key exchange.
 
@@ -120,7 +120,7 @@ Finally, the _Finished_ message is sent by both parties and it is the first encr
 
 The tunneling of data in OpenVPN is achieved through TUN/TAP devices[^4]. Simply put, TUN/TAP devices expose the operating system's network traffic as virtual interfaces. This traffic can then be operated upon by the userspace application that is bound to the TUN/TAP virtual interface.
 
-A TUN device operates on IP packets (layer 3), and a TAP device operates on ethernet frames (layer 2). The distinction is important, since operating on different networking layers enable different use cases. For example, if one wants Ethernet bridging, OpenVPN has to utilize TAP devices. For simple routing of traffic, TUN devices are a cheaper choice. A handy summary of the differences between bridging and routing is presented
+A TUN device operates on IP packets (layer 3), and a TAP device operates on Ethernet frames (layer 2). The distinction is important, since operating on different networking layers enable different use cases. For example, if one wants Ethernet bridging, OpenVPN has to utilize TAP devices. For simple routing of traffic, TUN devices are a cheaper choice. A handy summary of the differences between bridging and routing is presented
 [here](https://community.openvpn.net/openvpn/wiki/309-what-is-the-difference-between-bridging-and-routing).
 
 With OpenVPN and TUN/TAP devices, the Linux Kernel networking stack is involved and does the heavy-lifting of the traffic. The only purpose of the TUN/TAP device is to allow the user-space application, OpenVPN, to operate on the raw Ethernet frames or IP packets. This is where tunneling and encryption is applied. The Ethernet frame or IP packet is encrypted and wrapped inside another IP packet with appropriate headers for delivery, and vice versa.
