@@ -20,9 +20,9 @@ The purpose of these posts and the resulting software is purely educational - to
 
 # TUN/TAP devices
 
-To intercept low-level network traffic from the Linux kernel, we will use a Linux TAP device. In short, a TUN/TAP device is often used by networking userspace applications to manipulate L2/L3 traffic. A popular example is [tunneling]({% post_url 2016-02-20-openvpn-puts-packets-inside-your-packets %}#tunneling), where packets are wrapped inside the payload of another packet.
+To intercept low-level network traffic from the Linux kernel, we will use a Linux TAP device. In short, a TUN/TAP device is often used by networking userspace applications to manipulate L2/L3 traffic. A popular example is [tunneling]({% post_url 2016-02-20-openvpn-puts-packets-inside-your-packets %}#tunneling), where a packet is wrapped inside the payload of another packet.
 
-The advantage of TUN/TAP devices is that they're easy to set up in a userspace program and they are already being used in multitude of programs, such as [OpenVPN]({% post_url 2016-02-20-openvpn-puts-packets-inside-your-packets %}).
+The advantage of TUN/TAP devices is that they're easy to set up in a userspace program and they are already being used in a multitude of programs, such as [OpenVPN]({% post_url 2016-02-20-openvpn-puts-packets-inside-your-packets %}).
 
 As we want to build the networking stack from the layer 2 up, we need a TAP device. We instantiate it like so:
 
@@ -63,15 +63,46 @@ int tun_alloc(char *dev)
 }
 {% endhighlight %}
 
-After this, the file descriptor `tun_fd` can be used to read and write data to the virtual device's ethernet buffer.
+After this, the returned file descriptor `fd` can be used to read and write data to the virtual device's ethernet buffer.
 
 The flag `IFF_NO_PI` is crucial here, otherwise we end up with unnecessary packet information prepended to the Ethernet frame. You can actually take a look at the kernel's [source code](https://github.com/torvalds/linux/blob/v4.4/drivers/net/tun.c#L1306) of the tun-device driver and verify this yourself. 
 
 # Ethernet Frame Format
+
+The multitude of different Ethernet networking technologies are the backbone of connecting computers in _Local Area Networks_ (LANs). As with all physical technology, the Ethernet standard has greatly evolved from its first version[^ethernet], published by Digital Equipment Corporation, Intel and Xerox in 1980. 
+
+The first version of Ethernet was slow in today's standards - about 10Mb/s and it utilized half-duplex communication, meaning that you either sent or received data, but not at the same time. This is why a _Media Access Control_ (MAC) protocol had to be incorporated to organize the data flow. Even to this day, _Carrier Sense, Multiple Access with Collision Detection_ (CSMA/CD) is required as the MAC method if running an Ethernet interface in half-duplex mode. 
+
+The invention of the _100BASE-T_ Ethernet standard used twisted-pair wiring to enable full-duplex communication and the simultaneous increase in popularity of Ethernet switches made CSMA/CD largely obsolete. The Ethernet standards are developed by the IEEE 802.3[^ieee-802-3] working group.
+
+Next, we'll take a look at the Ethernet Frame format. The newest iteration can be declared as a C struct like this:
+
+{% highlight c %}
+struct ethframe {
+    char* src_mac,
+    char* dst_mac,
+    short ethertype,
+    char* payload,
+    int fcs
+};
+{% endhighlight %}
+
+The `src_mac` and `dst_mac` are pretty self-explanatory. They contain the MAC addresses of the communicating parties.
+
+The overloaded field, `ethertype`, is a 2-octet field, that depending on its value, either communicates the length or the type of the payload. Specifically, if the field's value is greater or equal to 1536, the field contains the type of the payload (e.g. IPv4, ARP). If the value is less than that, it contains the length of the payload.
+
+After the type field, there is a possibility of several different _tags_ for the Ethernet frame. These tags can be used to describe the _Virtual LAN_ (VLAN) or the _Quality of Service_ (QoS) type of the frame. Ethernet frame tags are excluded from our implementation, so the corresponding field also does not show up in our protocol declaration.
+
+The field `payload` contains a pointer to the Ethernet frame's payload. In our case, this will contain an ARP or IPv4 packet.
+
+The field `fcs` is the _Frame Check Sequence_, which should be used with _Cyclic Redundancy Check_ (CRC) to check the integrity of the frame. Calculating the CRC will be described later.`
+
+Lastly, if the payload length is smaller than the minimum required 48 bytes (without tags), pad bytes are appended to the end of the payload to meet the requirement.
 
 # Address Resolution Protocol
 
 
 # Sources
 [^tcp-roadmap]:<https://tools.ietf.org/html/rfc7414>
-[^tunneling]:<{% post_url 2015-04-03-boot-arch-linux-from-rpi %}>
+[^ethernet]:<http://ethernethistory.typepad.com/papers/EthernetSpec.pdf>
+[^ieee-802-3]:<https://en.wikipedia.org/wiki/IEEE_802.3>
