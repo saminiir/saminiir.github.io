@@ -75,29 +75,31 @@ The first version of Ethernet was slow in today's standards - about 10Mb/s and i
 
 The invention of the _100BASE-T_ Ethernet standard used twisted-pair wiring to enable full-duplex communication and the simultaneous increase in popularity of Ethernet switches made CSMA/CD largely obsolete. The Ethernet standards are developed by the IEEE 802.3[^ieee-802-3] working group.
 
-Next, we'll take a look at the Ethernet Frame format. The newest iteration can be declared as a C struct like this:
+Next, we'll take a look at the Ethernet Frame header. It can be declared as a C struct followingly:
 
 {% highlight c %}
-struct ethframe {
-    char* src_mac,
-    char* dst_mac,
-    short ethertype,
-    char* payload,
-    int fcs
+#include <linux/if_ether.h>
+
+struct eth_hdr
+{
+    unsigned char dst_mac[6];
+    unsigned char src_mac[6];
+    unsigned short ethertype;
+    unsigned char* payload;
 };
 {% endhighlight %}
 
-The `src_mac` and `dst_mac` are pretty self-explanatory. They contain the MAC addresses of the communicating parties.
+The `dst_mac` and `src_mac` are pretty self-explanatory fields. They contain the MAC addresses of the communicating parties.
 
 The overloaded field, `ethertype`, is a 2-octet field, that depending on its value, either communicates the length or the type of the payload. Specifically, if the field's value is greater or equal to 1536, the field contains the type of the payload (e.g. IPv4, ARP). If the value is less than that, it contains the length of the payload.
 
 After the type field, there is a possibility of several different _tags_ for the Ethernet frame. These tags can be used to describe the _Virtual LAN_ (VLAN) or the _Quality of Service_ (QoS) type of the frame. Ethernet frame tags are excluded from our implementation, so the corresponding field also does not show up in our protocol declaration.
 
-The field `payload` contains a pointer to the Ethernet frame's payload. In our case, this will contain an ARP or IPv4 packet.
+The field `payload` contains a pointer to the Ethernet frame's payload. In our case, this will contain an ARP or IPv4 packet. If the payload length is smaller than the minimum required 48 bytes (without tags), pad bytes are appended to the end of the payload to meet the requirement.
 
-The field `fcs` is the _Frame Check Sequence_, which should be used with _Cyclic Redundancy Check_ (CRC) to check the integrity of the frame. Calculating the CRC will be described later.`
+We also include the `if_ether.h` Linux header to provide a mapping between ethertypes and their hexadecimal values.
 
-Lastly, if the payload length is smaller than the minimum required 48 bytes (without tags), pad bytes are appended to the end of the payload to meet the requirement.
+Lastly, the Ethernet Frame Format also includes a last field  _Frame Check Sequence_, which is used as _Cyclic Redundancy Check_ (CRC) to check the integrity of the frame.
 
 # Address Resolution Protocol
 
