@@ -6,9 +6,9 @@ categories: networking
 permalink: lets-code-tcp-ip-stack-1-ethernet-arp
 ---
 
-Writing your own TCP/IP stack may sound like a daunting task. Indeed, TCP has accumulated many specifications over its lifetime of more than thirty years. The core specification, however, is seemingly compact[^tcp-roadmap] - the important parts being TCP header parsing, the state machine, congestion control and retransmission timeout computation.
+Writing your own TCP/IP stack may seem like a daunting task. Indeed, TCP has accumulated many specifications over its lifetime of more than thirty years. The core specification, however, is seemingly compact[^tcp-roadmap] - the important parts being TCP header parsing, the state machine, congestion control and retransmission timeout computation.
 
-The most common layer 2 and layer 3 protocols, Ethernet and IP respectively, pale in comparison to TCP's complexity. In this blog series, we will implement a minimal userspace TCP/IP stack for Linux.
+The most common layer 2 and layer 3 protocols, Ethernet and IP respectively, pale in comparison to TCP's complexity. In this blog series, we will implement a minimal userspace TCP/IP stack for Linux. 
 
 The purpose of these posts and the resulting software is purely educational - to learn network and system programming at a deeper level.
 
@@ -73,7 +73,9 @@ The multitude of different Ethernet networking technologies are the backbone of 
 
 The first version of Ethernet was slow in today's standards - about 10Mb/s and it utilized half-duplex communication, meaning that you either sent or received data, but not at the same time. This is why a _Media Access Control_ (MAC) protocol had to be incorporated to organize the data flow. Even to this day, _Carrier Sense, Multiple Access with Collision Detection_ (CSMA/CD) is required as the MAC method if running an Ethernet interface in half-duplex mode. 
 
-The invention of the _100BASE-T_ Ethernet standard used twisted-pair wiring to enable full-duplex communication and the simultaneous increase in popularity of Ethernet switches made CSMA/CD largely obsolete. The Ethernet standards are developed by the IEEE 802.3[^ieee-802-3] working group.
+The invention of the _100BASE-T_ Ethernet standard used twisted-pair wiring to enable full-duplex communication and higher throughput speeds. Additionally, the simultaneous increase in popularity of Ethernet switches made CSMA/CD largely obsolete. 
+
+The different Ethernet standards are maintained by the IEEE 802.3[^ieee-802-3] working group.
 
 Next, we'll take a look at the Ethernet Frame header. It can be declared as a C struct followingly:
 
@@ -91,7 +93,7 @@ struct eth_hdr
 
 The `dst_mac` and `src_mac` are pretty self-explanatory fields. They contain the MAC addresses of the communicating parties.
 
-The overloaded field, `ethertype`, is a 2-octet field, that depending on its value, either communicates the length or the type of the payload. Specifically, if the field's value is greater or equal to 1536, the field contains the type of the payload (e.g. IPv4, ARP). If the value is less than that, it contains the length of the payload.
+The overloaded field, `ethertype`, is a 2-octet field, that depending on its value, either indicates the length or the type of the payload. Specifically, if the field's value is greater or equal to 1536, the field contains the type of the payload (e.g. IPv4, ARP). If the value is less than that, it contains the length of the payload.
 
 After the type field, there is a possibility of several different _tags_ for the Ethernet frame. These tags can be used to describe the _Virtual LAN_ (VLAN) or the _Quality of Service_ (QoS) type of the frame. Ethernet frame tags are excluded from our implementation, so the corresponding field also does not show up in our protocol declaration.
 
@@ -99,7 +101,7 @@ The field `payload` contains a pointer to the Ethernet frame's payload. In our c
 
 We also include the `if_ether.h` Linux header to provide a mapping between ethertypes and their hexadecimal values.
 
-Lastly, the Ethernet Frame Format also includes a last field  _Frame Check Sequence_, which is used as _Cyclic Redundancy Check_ (CRC) to check the integrity of the frame.
+Lastly, the Ethernet Frame Format also includes the _Frame Check Sequence_ field in the end, which is used with _Cyclic Redundancy Check_ (CRC) to check the integrity of the frame.
 
 # Address Resolution Protocol
 
