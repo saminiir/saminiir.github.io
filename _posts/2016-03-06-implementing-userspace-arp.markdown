@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Let's code a TCP/IP stack, 1: Ethernet & ARP"
-date:   2016-03-06 13:00:00
+date:   2016-03-06 10:00:00
 categories: networking
 permalink: lets-code-tcp-ip-stack-1-ethernet-arp
 ---
