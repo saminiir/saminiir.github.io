@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Let's code a TCP/IP stack, 1: Ethernet & ARP"
-date:   2016-02-26 07:00:00
+date:   2016-03-06 13:00:00
 categories: networking
 permalink: lets-code-tcp-ip-stack-1-ethernet-arp
 ---
@@ -209,9 +209,9 @@ Yes: (almost definitely)
 
 Namely, the `translation table` is used to store the results of ARP, so that hosts can just look up whether they already have the entry in their cache. This avoids spamming the network for redundant ARP requests.
 
-The algorithm is implemented in [arp.c](https://github.com/saminiir/level-ip/blob/v1.0/src/arp.c#L53).
+The algorithm is implemented in [arp.c](https://github.com/saminiir/level-ip/blob/e9ceb08f01a5499b85f03e2d615309c655b97e8f/src/arp.c#L53).
 
-The ultimate test for the ARP implementation is to see whether it replies to ARP requests correctly:
+Finally, the ultimate test for an ARP implementation is to see whether it replies to ARP requests correctly:
 
 {% highlight bash %}
 [saminiir@localhost lvl-ip]$ arping -I tap0 10.0.0.4
@@ -224,7 +224,7 @@ Address                  HWtype  HWaddress           Flags Mask            Iface
 10.0.0.4                 ether   00:0c:29:6d:50:25   C                     tap0
 {% endhighlight %}
 
-The kernel's networking stack recognized the ARP reply and populated its ARP cache with the entry of our virtual network device. Success!
+The kernel's networking stack recognized the ARP reply from our custom networking stack, and consequently populated its ARP cache with the entry of our virtual network device. Success!
 
 # Conclusion
 
@@ -232,10 +232,11 @@ The minimal implementation of Ethernet Frame handling and ARP is relatively easy
 
 In the next post, we'll continue the implementation with ICMP echo & reply (ping) and IPv4 packet parsing.
 
-_Kudos to Xiaochen Wang, whose similar implementation proved invaluable for me in getting up to speed with C network programming and protocol handling. I find his [source code](https://github.com/chobits/tapip) easy to understand and some of my design choices were straight-out copied from his implementation._
+_Kudos to Xiaochen Wang, whose similar implementation proved invaluable for me in getting up to speed with C network programming and protocol handling. I find his [source code](https://github.com/chobits/tapip)[^tapip] easy to understand and some of my design choices were straight-out copied from his implementation._
 
 # Sources
 [^tcp-roadmap]:<https://tools.ietf.org/html/rfc7414>
 [^ethernet]:<http://ethernethistory.typepad.com/papers/EthernetSpec.pdf>
 [^ieee-802-3]:<https://en.wikipedia.org/wiki/IEEE_802.3>
 [^gnu-c-packed]:<https://gcc.gnu.org/onlinedocs/gcc/Common-Type-Attributes.html#Common-Type-Attributes>
+[^tapip]:<https://github.com/chobits/tapip>
