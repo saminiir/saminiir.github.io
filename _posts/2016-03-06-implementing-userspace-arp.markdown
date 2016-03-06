@@ -230,6 +230,8 @@ The kernel's networking stack recognized the ARP reply from our custom networkin
 
 The minimal implementation of Ethernet Frame handling and ARP is relatively easy and can be done in a few lines of code. On the contrary, the reward-factor is quite high, since you get to populate a Linux host's ARP cache with your own make-belief Ethernet device! 
 
+The source code for the project can be found at [GitHub](https://github.com/saminiir/level-ip).
+
 In the next post, we'll continue the implementation with ICMP echo & reply (ping) and IPv4 packet parsing.
 
 _Kudos to Xiaochen Wang, whose similar implementation proved invaluable for me in getting up to speed with C network programming and protocol handling. I find his [source code](https://github.com/chobits/tapip)[^tapip] easy to understand and some of my design choices were straight-out copied from his implementation._
