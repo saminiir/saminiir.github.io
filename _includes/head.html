@@ -9,7 +9,11 @@
   <!-- Twitter Card data -->
   <meta name="twitter:card" value="summary"> 
   <meta name="twitter:site" content="@saminiir">
+{% if page.title %}
   <meta name="twitter:title" content="{{ page.title }}">
+{% else %}
+  <meta name="twitter:title" content="{{ site.title }}">
+{% endif %}
 {% if page.description %}
   <meta name="twitter:description" content="{{ page.description }}">
 {% else %}
