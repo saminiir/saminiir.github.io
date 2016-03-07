@@ -5,7 +5,7 @@ date:   2016-01-24 19:00:00
 categories: cryptography
 permalink: establish-cryptographic-identity-using-gnupg
 comments: false
-excerpt: "Creating and managing PGP keys is not a straightforward matter. Many approaches exist and if you are a whistleblower, this tutorial probably does not meet your security standards. In fact, if there's a chance you'll be captured, tortured, or killed for the information you'll encrypt, stop reading this tutorial and pray for the best. You are doing it wrong."
+description: "Creating and managing PGP keys is not a straightforward matter. Many approaches exist and if you are a whistleblower, this tutorial probably does not meet your security standards. In fact, if there's a chance you'll be captured, tortured, or killed for the information you'll encrypt, stop reading this tutorial and pray for the best. You are doing it wrong."
 ---
 
 _DISCLAIMER: This article is a work-in-progress. I will update it when I have more experience with PGP keys and cryptography in general._

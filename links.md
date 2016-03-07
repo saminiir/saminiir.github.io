@@ -2,7 +2,7 @@
 layout: page
 title: Links
 permalink: /links/
-excerpt: "This page contains links to articles, papers and blog posts I've found insightful, in no particular order."
+description: "This page contains links to articles, papers and blog posts I've found insightful, in no particular order."
 ---
 
 This page contains links to articles, papers and blog posts I've found insightful, in no particular order.

@@ -2,8 +2,9 @@
 layout: post
 title:  "Let's code a TCP/IP stack, 1: Ethernet & ARP"
 date:   2016-03-06 10:00:00
-categories: networking
+categories: [tcp/ip, c programming, networking, tutorial, linux]
 permalink: lets-code-tcp-ip-stack-1-ethernet-arp
+description: "Writing your own TCP/IP stack may seem like a daunting task. Indeed, TCP has accumulated many specifications over its lifetime of more than thirty years. The core specification, however, is seemingly compact[^tcp-roadmap] - the important parts being TCP header parsing, the state machine, congestion control and retransmission timeout computation."
 ---
 
 Writing your own TCP/IP stack may seem like a daunting task. Indeed, TCP has accumulated many specifications over its lifetime of more than thirty years. The core specification, however, is seemingly compact[^tcp-roadmap] - the important parts being TCP header parsing, the state machine, congestion control and retransmission timeout computation.
