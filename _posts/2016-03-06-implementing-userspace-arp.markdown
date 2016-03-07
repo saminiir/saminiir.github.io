@@ -235,6 +235,8 @@ The source code for the project can be found at [GitHub](https://github.com/sami
 
 In the next post, we'll continue the implementation with ICMP echo & reply (ping) and IPv4 packet parsing.
 
+{% include twitter.html %}
+
 _Kudos to Xiaochen Wang, whose similar implementation proved invaluable for me in getting up to speed with C network programming and protocol handling. I find his [source code](https://github.com/chobits/tapip)[^tapip] easy to understand and some of my design choices were straight-out copied from his implementation._
 
 # Sources
