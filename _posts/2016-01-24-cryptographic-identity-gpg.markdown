@@ -139,9 +139,10 @@ Choose the `RSA (sign only)` option for generating a signing key only. Use the d
 
 Repeat the procedure, but this time, create a RSA (encrypt only) key.
 
-As a final step, save the keys you've made:
+As a final step, trust and save the keys you've made:
 
 {% highlight bash %}
+gpg> trust
 gpg> save
 {% endhighlight %}
 
