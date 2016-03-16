@@ -167,7 +167,7 @@ There are endless possibilities how to store your master keypair, from paper pri
 
 {% highlight bash %}
 $ gpg2 --export-secret-keys --armor $keyid > privkey
-$ gpg2 --export-keys --armor $keyid > pubkey
+$ gpg2 --export --armor $keyid > pubkey
 $ gpg2 --export-secret-subkeys $keyid > subkeys
 $ gpg2 --delete-secret-key $keyid
 $ gpg2 --delete-key $keyid
