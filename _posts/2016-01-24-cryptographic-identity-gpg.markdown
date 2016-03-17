@@ -213,7 +213,7 @@ Set the following as your keyserver configuration in `$GNUGPHOME/dirmngr.conf`.
 
 {% highlight bash %}
 keyserver hkps://hkps.pool.sks-keyservers.net
-hpk-cacert ca-cert-file=/path/to/CA/sks-keyservers.netCA.pem
+hkp-cacert /path/to/CA/sks-keyservers.netCA.pem
 {% endhighlight %}
 
 Send your public key to the keyserver pool. Afterwards you and anybody else can find your PGP identity.
