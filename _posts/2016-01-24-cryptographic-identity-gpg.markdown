@@ -177,7 +177,29 @@ $ shred subkeys
 
 You can verify that the master secret key should not be in the keyring by detecting `sec#` when listing the secret keys.
 
-Now, be sure to evacuate your master keypair `privkey` and `pubkey` with your chosen method to a safe location. I'm storing it in an encrypted USB drive.
+Now, be sure to evacuate your master keypair `privkey` and `pubkey` with your chosen method to a safe location. I'm storing it in an encrypted USB drive. The short gist of that is as follows:
+
+{% highlight bash %}
+$ lsblk
+$ mount /dev/sdb /mnt/usb
+$ dd if=/dev/zero of=/mnt/usb/disk.img bs=1M count=16
+$ loopdev=$(losetup -f)
+$ losetup $loopdev /mnt/usb/disk.img
+$ cryptsetup -v luksFormat $loopdev
+$ cryptsetup isLuks $loopdev && echo "Success"
+$ cryptsetup open $loopdev usbkey
+$ mkfs.ext3 /dev/mapper/usbkey
+$ mount /dev/mapper/usbkey /media/encrypted
+$ cp -r ~/.gnupg /media/encrypted/
+$ gpg2 --homedir /media/encrypted/.gnupg -K
+$ fuser -km /media/encrypted
+$ umount /media/encrypted
+$ cryptsetup remove usbkey
+$ losetup -d $loopdev
+$ umount /mnt/usb
+{% endhighlight %}
+
+You can [automatize the mounting of the encrypted filesystem](https://help.ubuntu.com/community/GPGKeyOnUSBDrive).
 
 ## Sending the public key to a key server
 
