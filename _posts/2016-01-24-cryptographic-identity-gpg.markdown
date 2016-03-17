@@ -173,6 +173,16 @@ $ gpg2 --import subkeys
 $ shred subkeys
 {% endhighlight %}
 
+Alternatively, with gpg2, you can delete keys without needing to twiddle with exporting and importing:
+
+{% highlight bash %}
+# Get the keygrip of the key to be deleted
+$ gpg2 -K --with-keygrip
+$ rm .gnupg/private-keys-v1.d/$keygrip.key
+# Make sure the older gpg format, secring.gpg, is empty and does not contain the key
+$ ls -l .gnupg/secring.gpg 
+{% endhighlight %}
+
 You can verify that the master secret key should not be in the keyring by detecting `sec#` when listing the secret keys.
 
 Now, be sure to evacuate your master keypair `privkey` and `pubkey` with your chosen method to a safe location. I'm storing it in an encrypted USB drive. The short gist of that is as follows:
