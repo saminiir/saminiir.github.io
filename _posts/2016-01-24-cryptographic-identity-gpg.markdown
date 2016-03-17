@@ -271,6 +271,32 @@ gpg> expire
 
 Again, you need your master keypair for this operation to succeed.
 
+## Revoking the master key
+
+To revoke your key, simply import the revocation certificate and update keyservers:
+
+{% highlight bash %}
+# Read the cert, you need to modify it to prevent accidental revokement 
+$ vim .gnupg/openpgp-revocs.d/revcert.rev
+$ gpg2 --import revcert.rev
+$ gpg2 --send $keyid
+{% endhighlight %}
+
+Do not delete revoked keys. They are still useful to decrypt data previously encrypted with the old key.
+
+## Revoking a subkey
+
+To revoke a subkey, revoke it from gpg's interface:
+
+{% highlight bash %}
+$ gpg2 --edit-key saminiir@gmail.com
+gpg> list
+gpg> key 2
+gpg> revkey
+{% endhighlight %}
+
+Again, do not delete revoked keys. They are still useful to decrypt data previously encrypted with the old key.
+
 {% include twitter.html %}
 
 # Notes
