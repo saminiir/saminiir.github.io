@@ -1,9 +1,9 @@
 ---
 layout: post
-title:  "Let's code a TCP/IP stack, 2: IP & ICMP"
+title:  "Let's code a TCP/IP stack, 2: IPv4 & ICMPv4"
 date:   2016-03-12 10:00:00
 categories: [tcp/ip, tutorial, c programming, ip, icmp, networking, linux]
-permalink: lets-code-tcp-ip-stack-2-ip-icmp
+permalink: lets-code-tcp-ip-stack-2-ipv4-icmpv4
 description: "TODO: Fill"
 ---
 
