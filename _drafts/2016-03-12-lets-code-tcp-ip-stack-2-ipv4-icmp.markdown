@@ -15,9 +15,9 @@ Test
 * Will be replaced with the ToC, excluding the "Contents" header
 {:toc}
 
-# IPv4
+# Internet Protocol version 4
 
-## IP Header Format
+## Header Format
 
 The IPv4 header is somewhat lengthy, 20 octets in total. The meaning of the fields is relatively straightforward, however, depicted as a C struct:
 
@@ -60,18 +60,35 @@ The _header checksum_ field, `csum`, is used to verify the integrity of the IP h
 
 Finally, the `saddr` and `daddr` fields indicate the source and destination addresses of the datagram, respectively. Even though the fields are 32-bit in length and can thus depict approximately 4.5 billion addresses, the address range is still too small for our communication-centric society. The IPv6 protocol extends this length to 128-bits and as a result, future-proofs the address range of the Internet Protocol, perhaps permanently.
 
-## IP Fragmentation 
+## Internet Checksum
+
+The Internet checksum field is used to check the integrity of an IP datagram. Calculating the checksum is relatively simple, and is done as follows:
+
+## Options field
+
+## Fragmentation 
 
 Test 
 
-## IP Checksum
+## Attacks on IP
 
-Test
+# Internet Control Message Protocol version 4
 
-# ICMPv4
+As the Internet Protocol lacked mechanisms for reliability, some way of informing communicating parties of possible error scenarios is required. As a result, the _Internet Control Message Protocol_ (ICMP)[^icmpv4-spec] is used for diagnostic measures in the network. An example of this is the case where a gateway is not reachable - the network stack that recognizes this sends an ICMP "Gateway Unreachable" message back to the origin.
+
+## Message Format
+
+## Messages and their processing
+
+## Checksum
+
+## Attacks on ICMP
+
+# Pinging the stack's network device
 
 # Conclusion
 
 # Sources
 [^tcp-roadmap]:<https://tools.ietf.org/html/rfc7414>
 [^ipv4-spec]:<http://tools.ietf.org/html/rfc791>
+[^icmpv4-spec]:<https://www.ietf.org/rfc/rfc792.txt>
