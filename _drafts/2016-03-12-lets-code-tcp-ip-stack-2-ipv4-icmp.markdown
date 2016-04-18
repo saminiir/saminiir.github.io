@@ -126,7 +126,21 @@ As the Internet Protocol lacked mechanisms for reliability, some way of informin
 
 ## Attacks on ICMP
 
-# Pinging the stack's network device
+# Testing the implementation
+
+From a shell, we can verify that our userspace networking stack responds to ICMP echo requests:
+
+{% highlight bash %}
+[saminiir@localhost ~]$ ping -c3 10.0.0.4
+PING 10.0.0.4 (10.0.0.4) 56(84) bytes of data.
+64 bytes from 10.0.0.4: icmp_seq=1 ttl=64 time=0.191 ms
+64 bytes from 10.0.0.4: icmp_seq=2 ttl=64 time=0.200 ms
+64 bytes from 10.0.0.4: icmp_seq=3 ttl=64 time=0.150 ms
+
+--- 10.0.0.4 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 1999ms
+rtt min/avg/max/mdev = 0.150/0.180/0.200/0.024 ms
+{% endhighlight %}
 
 # Conclusion
 
