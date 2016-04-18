@@ -96,6 +96,15 @@ uint16_t checksum(void *addr, int count)
 }
 {% endhighlight %}
 
+Take the example IP header `45 00 00 54 41 e0 40 00 40 01 00 00 0a 00 00 04 0a 00 00 05`:
+
+1. Adding the fields together yields the two's complement sum `1 1b 3e`.
+2. Then, to convert it to one's complement, the carry-over bits are added to the first 16-bits: `1b 3e` + `1` = `1b 3f`.
+3. Finally, the one's complement of the sum is taken, resulting to the checksum value `e4c0`.
+
+The IP header becomes `45 00 00 54 41 e0 40 00 40 01 e4 c0 0a 00 00 04 0a 00 00 05`.
+
+The checksum can be verified by applying the algorithm again and if the result is 0, the data is most likely good. 
 
 ## Options field
 
