@@ -96,6 +96,37 @@ uint16_t checksum(void *addr, int count)
 }
 {% endhighlight %}
 
+The code is pretty self-explanatory, but here's how the algorithm is applied to an example IP header:
+
+{% highlight c %}
+1. Sum the 16-bit words together:
+    45 00
+    00 54
+    41 e0
+    40 00
+    40 01
+    e4 c0 <- checksum
+    0a 00
+    00 04
+    0a 00
+    00 05
+    =====
+  1 1b 3e 
+
+2. Add carry-over bits to the 16-bit sum:
+
+    1b 3e
+        1
+    =====
+    1b 3f
+    
+3. Take the one's complement of the sum (invert the bits):
+
+   ~1b3f
+   =====
+    e4c0
+{% endhighlight %}
+
 
 ## Options field
 
