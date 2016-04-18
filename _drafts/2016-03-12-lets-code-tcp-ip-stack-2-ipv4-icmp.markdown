@@ -62,7 +62,40 @@ Finally, the `saddr` and `daddr` fields indicate the source and destination addr
 
 ## Internet Checksum
 
-The Internet checksum field is used to check the integrity of an IP datagram. Calculating the checksum is relatively simple, and is done as follows:
+The Internet checksum field is used to check the integrity of an IP datagram. Calculating the checksum is relatively simple and is defined in the original specification[^ipv4-spec]:
+
+  _The checksum field is the 16 bit one’s complement of the one’s complement sum of all 16 bit words in the header.  For purposes of computing the checksum, the value of the checksum field is zero._
+
+The actual[^internet-checksum-spec] code for the algorithm is as follows:  
+{% highlight c %}
+uint16_t checksum(void *addr, int count)
+{
+    /* Compute Internet Checksum for "count" bytes
+     *         beginning at location "addr".
+     * Taken from https://tools.ietf.org/html/rfc1071
+     */
+
+    register uint32_t sum = 0;
+    uint16_t * ptr = addr;
+
+    while( count > 1 )  {
+        /*  This is the inner loop */
+        sum += * ptr++;
+        count -= 2;
+    }
+
+    /*  Add left-over byte, if any */
+    if( count > 0 )
+        sum += * (uint8_t *) addr;
+
+    /*  Fold 32-bit sum to 16 bits */
+    while (sum>>16)
+        sum = (sum & 0xffff) + (sum >> 16);
+
+    return ~sum;
+}
+{% endhighlight %}
+
 
 ## Options field
 
@@ -92,3 +125,4 @@ As the Internet Protocol lacked mechanisms for reliability, some way of informin
 [^tcp-roadmap]:<https://tools.ietf.org/html/rfc7414>
 [^ipv4-spec]:<http://tools.ietf.org/html/rfc791>
 [^icmpv4-spec]:<https://www.ietf.org/rfc/rfc792.txt>
+[^internet-checksum-spec]:<https://tools.ietf.org/html/rfc1071>
