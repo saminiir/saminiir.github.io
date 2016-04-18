@@ -106,25 +106,48 @@ The IP header becomes `45 00 00 54 41 e0 40 00 40 01 e4 c0 0a 00 00 04 0a 00 00 
 
 The checksum can be verified by applying the algorithm again and if the result is 0, the data is most likely good. 
 
-## Options field
-
-## Fragmentation 
-
-Test 
-
-## Attacks on IP
-
 # Internet Control Message Protocol version 4
 
-As the Internet Protocol lacked mechanisms for reliability, some way of informing communicating parties of possible error scenarios is required. As a result, the _Internet Control Message Protocol_ (ICMP)[^icmpv4-spec] is used for diagnostic measures in the network. An example of this is the case where a gateway is not reachable - the network stack that recognizes this sends an ICMP "Gateway Unreachable" message back to the origin.
+As the Internet Protocol lacks mechanisms for reliability, some way of informing communicating parties of possible error scenarios is required. As a result, the _Internet Control Message Protocol_ (ICMP)[^icmpv4-spec] is used for diagnostic measures in the network. An example of this is the case where a gateway is not reachable - the network stack that recognizes this sends an ICMP "Gateway Unreachable" message back to the origin.
 
-## Message Format
+## Header Format
+
+The ICMP header resides in the payload of the corresponding IP packet. The structure of the ICMPv4 header is as follows:
+
+{% highlight c %}
+struct icmp_v4 {
+    uint8_t type;
+    uint8_t code;
+    uint16_t csum;
+    uint8_t data[];
+} __attribute__((packed));
+{% endhighlight %}
+
+Here, the `type` field communicates the purpose of the message. 42 different[^iana-icmp-types] values are reserved for the type field, but only about 8 are commonly used. In our implementation, the types 0 (Echo Reply), 3 (Destination Unreachable) and 8 (Echo request) are used.
+
+The `code` field further describes the meaning of the message. For example, when the type is 3 (Destination Unreachable), the code-field implies the reason. A common error is when a packet cannot be routed to a network: the originating host then most likely receives an ICMP message with the type 3 and code 0 (Net Unreachable).
+
+The `csum` field is the same checksum field as in the IPv4 header, and the same algorithm can be used to calculate it. In ICMPv4 however, the payload is also included into the checksum.
 
 ## Messages and their processing
 
-## Checksum
+The actual ICMP payload consists of query/informational messages and error messages. First, we'll look at the Echo Request/Reply messages, commonly referred to as "pinging" in networking:
 
-## Attacks on ICMP
+{% highlight c %}
+struct icmp_v4_echo {
+    uint16_t id;
+    uint16_t seq;
+    uint8_t data[];
+} __attribute__((packed));
+{% endhighlight %}
+
+The message format is compact. The field `id` is set by the sending host to determine to which process the echo reply is intended. For example, the process id can be set in to this field.
+
+The field `seq` is the sequence number of the echo and it is simply a number starting from zero and incremented by one whenever a new echo request is formed. This is used to detect if echo messages disappear or are reordered while in transit.
+
+The `data` field is optional, but often contains information like the timestamp of the echo. This can then be used to estimate the round-trip time between hosts..
+
+## Checksum
 
 # Testing the implementation
 
@@ -149,3 +172,4 @@ rtt min/avg/max/mdev = 0.150/0.180/0.200/0.024 ms
 [^ipv4-spec]:<http://tools.ietf.org/html/rfc791>
 [^icmpv4-spec]:<https://www.ietf.org/rfc/rfc792.txt>
 [^internet-checksum-spec]:<https://tools.ietf.org/html/rfc1071>
+[^iana-icmp-types]:<http://www.iana.org/assignments/icmp-parameters/icmp-parameters.xhtml>
