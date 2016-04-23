@@ -29,7 +29,7 @@ If reliability between the communicating parties is required, a protocol such as
 
 ## Header Format
 
-The IPv4 header is somewhat lengthy, 20 octets in total. The meaning of the fields is relatively straightforward, however, depicted as a C struct:
+The IPv4 header is somewhat lengthy, 20 octets in total. The meaning of the fields is relatively straightforward and can be described as a C struct:
 
 {% highlight c %}
 struct iphdr {
@@ -50,11 +50,11 @@ struct iphdr {
 
 The 4-bit `version` field indicates the format of the internet header. In our case, this will be the value 4 for IPv4.
 
-The _Internet Header Length_ ,`ihl`,  field is likewise 4 bits in length and indicates the number of 32-bit _words_ in the IP header. The savviest hacker has already calculated (or knew) that because the field is 4-bit, it can only hold a maximum value of 15. Thus the maximum length of an IP header is 60 octets (15 times 32 divided by eight).
+The _Internet Header Length_ field `ihl` is likewise 4 bits in length and indicates the number of 32-bit _words_ in the IP header. Because the field is 4 bits in size, it can only hold a maximum value of 15. Thus the maximum length of an IP header is 60 octets (15 times 32 divided by eight).
 
-The _type of service_ field, `tos`, originates from the original IP specification[^ipv4-spec]. It has been divided into smaller fields in later specifications, but for simplicity's sake, we will treat the field as defined in the original specification. The field communicates the quality of service intended for the IP datagram.  
+The _type of service_ field `tos` originates from the original IP specification[^ipv4-spec]. It has been divided into smaller fields in later specifications, but for simplicity's sake, we will treat the field as defined in the original specification. The field communicates the quality of service intended for the IP datagram.  
 
-The _total length_, `len`, field communicates the length of the whole IP datagram. As it is a 16-bit field, its maximum value is 64 kilobytes (2 to the power of 16, minus 1, equalling 65535 bits).
+The _total length_ field `len`  communicates the length of the whole IP datagram. As it is a 16-bit field, its maximum value is 65535. Large IP datagrams are subject to fragmentation, in which they are split into smaller datagrams in order to satisfy the _Maximum Transmission Unit_ (MTU) of different communication interfaces.
 
 The `id` field is used to index the datagram and is ultimately used for reassembly of fragmented IP datagrams. The field's value is simply a counter that is incremented by the sending party. In turn, the receiving end then knows how to order the incoming datagrams.
 
@@ -108,8 +108,8 @@ uint16_t checksum(void *addr, int count)
 
 Take the example IP header `45 00 00 54 41 e0 40 00 40 01 00 00 0a 00 00 04 0a 00 00 05`:
 
-1. Adding the fields together yields the two's complement sum `1 1b 3e`.
-2. Then, to convert it to one's complement, the carry-over bits are added to the first 16-bits: `1b 3e` + `1` = `1b 3f`.
+1. Adding the fields together yields the two's complement sum `01 1b 3e`.
+2. Then, to convert it to one's complement, the carry-over bits are added to the first 16-bits: `1b 3e` + `01` = `1b 3f`.
 3. Finally, the one's complement of the sum is taken, resulting to the checksum value `e4c0`.
 
 The IP header becomes `45 00 00 54 41 e0 40 00 40 01 e4 c0 0a 00 00 04 0a 00 00 05`.
@@ -155,7 +155,7 @@ The message format is compact. The field `id` is set by the sending host to dete
 
 The field `seq` is the sequence number of the echo and it is simply a number starting from zero and incremented by one whenever a new echo request is formed. This is used to detect if echo messages disappear or are reordered while in transit.
 
-The `data` field is optional, but often contains information like the timestamp of the echo. This can then be used to estimate the round-trip time between hosts..
+The `data` field is optional, but often contains information like the timestamp of the echo. This can then be used to estimate the round-trip time between hosts.
 
 Perhaps the most common ICMPv4 error message, _Destination Unreachable_, has the following format:
 
