@@ -190,6 +190,12 @@ rtt min/avg/max/mdev = 0.150/0.180/0.200/0.024 ms
 
 # Conclusion
 
+A minimum viable networking stack that handles Ethernet frames, ARP and IP can be created relatively easily. However, the original specifications have been extended with many new ones. In this post, we skimmed over IP features such as options, fragmentation and the header DCN and DS fields.
+
+The code for the project can be found from TODO: link
+
+In the next blog post, we will advance to the next network layer (L4), and start implementing the notorious _Transmission Control Protocol_ (TCP).
+
 # Sources
 [^tcp-roadmap]:<https://tools.ietf.org/html/rfc7414>
 [^ipv4-spec]:<http://tools.ietf.org/html/rfc791>
