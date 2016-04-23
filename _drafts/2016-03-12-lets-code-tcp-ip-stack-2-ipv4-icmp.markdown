@@ -157,7 +157,20 @@ The field `seq` is the sequence number of the echo and it is simply a number sta
 
 The `data` field is optional, but often contains information like the timestamp of the echo. This can then be used to estimate the round-trip time between hosts..
 
-## Checksum
+Perhaps the most common ICMPv4 error message, _Destination Unreachable_, has the following format:
+
+{% highlight c %}
+struct icmp_v4_dst_unreachable {
+    uint8_t unused;
+    uint8_t len;
+    uint16_t var;
+    uint8_t data[];
+} __attribute__((packed));
+{% endhighlight %}
+
+The first octet is unused. Then, the `len` field indicates the length of the original datagram, in 4-octet units for IPv4. The value of the 2-octet field `var` depends on the ICMP code.
+
+Finally, as much as possible of the original IP packet that caused the Destination Unreachable state is placed into the `data` field.
 
 # Testing the implementation
 
