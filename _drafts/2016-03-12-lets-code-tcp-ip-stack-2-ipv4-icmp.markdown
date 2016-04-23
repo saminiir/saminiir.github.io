@@ -196,3 +196,6 @@ rtt min/avg/max/mdev = 0.150/0.180/0.200/0.024 ms
 [^icmpv4-spec]:<https://www.ietf.org/rfc/rfc792.txt>
 [^internet-checksum-spec]:<https://tools.ietf.org/html/rfc1071>
 [^iana-icmp-types]:<http://www.iana.org/assignments/icmp-parameters/icmp-parameters.xhtml>
+[^stevens-tcpip]:<https://en.wikipedia.org/wiki/TCP/IP_Illustrated#Volume_1:_The_Protocols>
+[^osi-model]:<https://en.wikipedia.org/wiki/OSI_model>
+[^ipv6-adoption]:<https://en.wikipedia.org/wiki/IPv6_deployment>
