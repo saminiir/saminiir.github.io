@@ -21,6 +21,12 @@ For our networking stack IPv4 was chosen over IPv6 since it is still the default
 
 # Internet Protocol version 4
 
+The next networking layer (L3)[^osi-model] in our implementation, after Ethernet frames, handles the delivery of data to a destination. Namely, the _Internet Protocol_ was invented to provide a base for higher level protocols, such as TCP and UDP. IP is connectionless, meaning that unlike TCP, all of the datagrams are handled independently of each other in the networking stack. This also means, that IP datagrams may arrive out-of-order.[^stevens-tcpip]
+
+Furthermore, IP does not guarantee successful delivery. This is a conscious choice taken by the protocol designers, since IP is meant to provide a base for protocols that likewise do not guarantee delivery.
+
+If reliability between the communicating parties is required, a protocol such as TCP is used on top of IP.
+
 ## Header Format
 
 The IPv4 header is somewhat lengthy, 20 octets in total. The meaning of the fields is relatively straightforward, however, depicted as a C struct:
