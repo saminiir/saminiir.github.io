@@ -68,7 +68,7 @@ The `proto` field provides the datagram an inherent ability to carry other proto
 
 The _header checksum_ field, `csum`, is used to verify the integrity of the IP header. The algorithm for it is relatively simple, and will be explained further down in this tutorial.
 
-Finally, the `saddr` and `daddr` fields indicate the source and destination addresses of the datagram, respectively. Even though the fields are 32-bit in length and can thus depict approximately 4.5 billion addresses, the address range is still too small for our communication-centric society. The IPv6 protocol extends this length to 128-bits and as a result, future-proofs the address range of the Internet Protocol, perhaps permanently.
+Finally, the `saddr` and `daddr` fields indicate the source and destination addresses of the datagram, respectively. Even though the fields are 32-bit in length and thus provide a pool of approximately 4.5 billion addresses, the address range is still going to be exhausted. The IPv6 protocol extends this length to 128 bits and as a result, future-proofs the address range of the Internet Protocol, perhaps permanently.
 
 ## Internet Checksum
 
