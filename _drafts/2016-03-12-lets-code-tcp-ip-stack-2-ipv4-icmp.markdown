@@ -7,7 +7,11 @@ permalink: lets-code-tcp-ip-stack-2-ipv4-icmpv4
 description: "TODO: Fill"
 ---
 
-Test
+This time we will implement a minimum viable IP layer and test it with ICMP echo requests (also known as _pings_). 
+
+We will take a look at the headers of IPv4 and ICMPv4, and describe how to check their headers for integrity. Some features, such as IP fragmentation, are left as an exercise for the reader.
+
+For our networking stack IPv4 was chosen over IPv6 since it is still the default protocol in the Internet. However, this is changing fast[^ipv6-adoption] and IPv6 is planned to be added to our networking stack after the TCP implementation.
 
 # Contents
 {:.no_toc}
