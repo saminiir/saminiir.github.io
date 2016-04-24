@@ -4,7 +4,7 @@ title:  "Booting Arch Linux from PXE (Raspberry Pi)"
 date:   2015-04-03 16:43:37
 categories: meta
 permalink: boot-arch-linux-from-pxe
-description: "So over the weekend I had the great idea of reinstalling my Linux setup, mainly to incorporate LVM and LUKS to the installation from the get-go. And as if installing and configuring a new \*NIX environment is not time consuming enough, I decided to boot the installation image from PXE."
+description: "So over the weekend I had the great idea of reinstalling my Linux setup, mainly to incorporate LVM and LUKS to the installation from the get-go. And as if installing and configuring a new *NIX environment is not time consuming enough, I decided to boot the installation image from PXE."
 ---
 
 So over the weekend I had the great idea of reinstalling my Linux setup, mainly to incorporate [LVM](http://en.wikipedia.org/wiki/Logical_Volume_Manager_%28Linux%29) and [LUKS](http://en.wikipedia.org/wiki/Linux_Unified_Key_Setup) to the installation from the get-go.
