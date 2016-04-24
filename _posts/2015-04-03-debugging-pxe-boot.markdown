@@ -4,6 +4,7 @@ title:  "Debugging PXE boot with QEMU"
 date:   2015-04-03 16:44:37
 categories: meta
 permalink: debugging-pxe-boot
+description: "You might run into configuration problems and booting an actual machine is time-consuming for testing. My situation, for example, was that I could not get the Raspberry serving the PXE-protocol to respond to legitimate requests. I needed a better environment to debug the problem than booting my desktop for every iteration. And here steps in QEMU. It's a fine piece of computer science originally by Fabrice Bellard, enabling super-fast virtualization of machines."
 ---
 
 In my [earlier post]({% post_url 2015-04-03-boot-arch-linux-from-rpi %}), I defined the steps for setting up a PXE boot environment.
