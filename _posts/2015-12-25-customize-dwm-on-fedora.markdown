@@ -3,7 +3,7 @@ layout: post
 title:  "Customize dwm on Fedora"
 date:   2015-12-25 17:00:00
 categories: fedora
-permalink: customize-dwm-on-fedora
+permalink: customize-dwm-on-fedora/
 description: "So at work I'm using a Macbook, but OS X has increasingly interfered with my development routine. The last drop that tipped the glass was no native support for Docker in OS X, obviously. Hence I'm moving to using a Linux VM in VMware. I chose Fedora, because that's what Linus uses. Just kidding. I wanted to learn a Red Hat based distro this time, since Debian and Arch are already familiar to me."
 ---
 

@@ -3,7 +3,7 @@ layout: post
 title:  "Automate all the camera photo uploads, part I"
 date:   2015-12-07 20:00:00
 categories: raspberry-pi
-permalink: automate-camera-photo-uploads-part-1
+permalink: automate-camera-photo-uploads-part-1/
 description: "So this fall I've been getting into photography and with my super small new camera (Lumix GM1) I'm looking forward to taking horrendous photos of unexpecting people. As the nerd I am, however, I deem that no tasks should be done repeatedly and manually. This is also true for transferring photos from camera to safety. Ideally, you would only power on the camera and the photos would just sync to your computer and/or cloud service. As the year is 2015 you would expect a pretty much seamless (and wireless) user experience for scenarios like this, but alas, that is not the case."
 ---
 

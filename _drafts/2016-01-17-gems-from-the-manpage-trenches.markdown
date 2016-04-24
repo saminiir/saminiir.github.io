@@ -3,7 +3,7 @@ layout: post
 title:  "Gems from the man page trenches"
 date:   2016-01-17 08:00:00
 categories: cryptography
-permalink: gems-from-man-page-trenches
+permalink: gems-from-man-page-trenches/
 ---
 
 I'm a big fan of UNIX man pages[^1]. They are almost without exception well-written and concise, and the intuition you gain for particular topics when you browse through the man pages is well worth the effort. In contrast, some developers shoot straight to googling something like "How to print date with format in Linux". 

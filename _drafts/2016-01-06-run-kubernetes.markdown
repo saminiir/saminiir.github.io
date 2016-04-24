@@ -3,7 +3,7 @@ layout: post
 title:  "Single-node Kubernetes in Docker"
 date:   2016-01-06 08:00:00
 categories: containers
-permalink: single-node-kubernetes-docker
+permalink: single-node-kubernetes-docker/
 ---
 
 TODO:

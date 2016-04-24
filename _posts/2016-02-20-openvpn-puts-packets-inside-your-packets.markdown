@@ -3,7 +3,7 @@ layout: post
 title:  "OpenVPN puts packets inside your packets"
 date:   2016-02-20 07:00:00
 categories: networking
-permalink: openvpn-puts-packets-inside-your-packets
+permalink: openvpn-puts-packets-inside-your-packets/
 ---
 
 I realized I do not know exactly *how* OpenVPN does its magic in Linux.
