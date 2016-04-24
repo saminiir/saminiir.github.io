@@ -198,6 +198,8 @@ The source code for this blog post can be found at [GitHub](https://github.com/s
 
 In the next blog post we will advance to the transport layer (L4) and start implementing the notorious _Transmission Control Protocol_ (TCP). Namely, TCP is a connection-oriented protocol and ensures reliability between both communicating sides. These aspects obviously bring about more complexity, and being an old protocol, TCP has its dark corners.
 
+{% include twitter.html %}
+
 # Sources
 [^tcp-roadmap]:<https://tools.ietf.org/html/rfc7414>
 [^ipv4-spec]:<http://tools.ietf.org/html/rfc791>
