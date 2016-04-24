@@ -21,7 +21,7 @@ For our networking stack IPv4 was chosen over IPv6 since it is still the default
 
 # Internet Protocol version 4
 
-The next layer (L3)[^osi-model] in our implementation, after Ethernet frames, handles the delivery of data to a destination. Namely, the _Internet Protocol_ (IP) was invented to provide a base for transport protocols such as TCP and UDP. IP is connectionless, meaning that unlike TCP, all of the datagrams are handled independently of each other in the networking stack. This also means that IP datagrams may arrive out-of-order.[^stevens-tcpip]
+The next layer (L3)[^osi-model] in our implementation, after Ethernet frames, handles the delivery of data to a destination. Namely, the _Internet Protocol_ (IP) was invented to provide a base for transport protocols such as TCP and UDP. It is connectionless, meaning that unlike TCP, all of the datagrams are handled independently of each other in the networking stack. This also means that IP datagrams may arrive out-of-order.[^stevens-tcpip]
 
 Furthermore, IP does not guarantee successful delivery. This is a conscious choice taken by the protocol designers, since IP is meant to provide a base for protocols that likewise do not guarantee delivery. UDP is one such protocol.
 
@@ -54,7 +54,7 @@ The _Internet Header Length_ field `ihl` is likewise 4 bits in length and indica
 
 The _type of service_ field `tos` originates from the first IP specification[^ipv4-spec]. It has been divided into smaller fields in later specifications, but for simplicity's sake, we will treat the field as defined in the original specification. The field communicates the quality of service intended for the IP datagram.  
 
-The _total length_ field `len`  communicates the length of the whole IP datagram. As it is a 16-bit field, its maximum value is 65535. Large IP datagrams are subject to fragmentation, in which they are split into smaller datagrams in order to satisfy the _Maximum Transmission Unit_ (MTU) of different communication interfaces.
+The _total length_ field `len`  communicates the length of the whole IP datagram. As it is a 16-bit field, the maximum length is then 65535 bytes. Large IP datagrams are subject to fragmentation, in which they are split into smaller datagrams in order to satisfy the _Maximum Transmission Unit_ (MTU) of different communication interfaces.
 
 The `id` field is used to index the datagram and is ultimately used for reassembly of fragmented IP datagrams. The field's value is simply a counter that is incremented by the sending party. In turn, the receiving side knows how to order the incoming fragments.
 
