@@ -4,12 +4,12 @@ title:  "Let's code a TCP/IP stack, 2: IPv4 & ICMPv4"
 date:   2016-04-24 09:00:00
 categories: [tcp/ip, tutorial, c programming, ip, icmp, networking, linux]
 permalink: lets-code-tcp-ip-stack-2-ipv4-icmpv4
-description: "This time in our tutorial userspace TCP/IP stack we will implement a minimum viable IP layer and test it with ICMP echo requests. We will take a look at the headers of IPv4 and ICMPv4, and describe how to check them for integrity. Some features, such as IP fragmentation, are left as an exercise for the reader."
+description: "This time in our tutorial userspace TCP/IP stack we will implement a minimum viable IP layer and test it with ICMP echo requests. We will take a look at the headers of IPv4 and ICMPv4 and describe how to check them for integrity. Some features, such as IP fragmentation, are left as an exercise for the reader."
 ---
 
 This time in our userspace TCP/IP stack we will implement a minimum viable IP layer and test it with ICMP echo requests (also known as _pings_). 
 
-We will take a look at the headers of IPv4 and ICMPv4, and describe how to check them for integrity. Some features, such as IP fragmentation, are left as an exercise for the reader.
+We will take a look at the formats of IPv4 and ICMPv4 and describe how to check them for integrity. Some features, such as IP fragmentation, are left as an exercise for the reader.
 
 For our networking stack IPv4 was chosen over IPv6 since it is still the default network protocol for the Internet. However, this is changing fast[^ipv6-adoption] and our networking stack can be extended with IPv6 in the future.
 
@@ -29,7 +29,7 @@ If reliability between the communicating parties is required, a protocol such as
 
 ## Header Format
 
-The IPv4 header is somewhat lengthy, 20 octets in total. The meaning of the fields is relatively straightforward and can be described as a C struct:
+The IPv4 header is typically 20 octets in length. The header can contain trailing options, but they are omitted from our implementation. The meaning of the fields is relatively straightforward and can be described as a C struct:
 
 {% highlight c %}
 struct iphdr {
