@@ -1,13 +1,13 @@
 ---
 layout: post
 title:  "Let's code a TCP/IP stack, 2: IPv4 & ICMPv4"
-date:   2016-03-12 10:00:00
+date:   2016-04-24 10:00:00
 categories: [tcp/ip, tutorial, c programming, ip, icmp, networking, linux]
 permalink: lets-code-tcp-ip-stack-2-ipv4-icmpv4
-description: "TODO: Fill"
+description: "This time in our tutorial userspace TCP/IP stack we will implement a minimum viable IP layer and test it with ICMP echo requests. We will take a look at the headers of IPv4 and ICMPv4, and describe how to check them for integrity. Some features, such as IP fragmentation, are left as an exercise for the reader."
 ---
 
-This time we will implement a minimum viable IP layer and test it with ICMP echo requests (also known as _pings_). 
+This time in our userspace TCP/IP stack we will implement a minimum viable IP layer and test it with ICMP echo requests (also known as _pings_). 
 
 We will take a look at the headers of IPv4 and ICMPv4, and describe how to check them for integrity. Some features, such as IP fragmentation, are left as an exercise for the reader.
 
