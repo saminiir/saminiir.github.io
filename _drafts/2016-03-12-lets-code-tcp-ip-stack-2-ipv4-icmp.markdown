@@ -9,9 +9,9 @@ description: "TODO: Fill"
 
 This time we will implement a minimum viable IP layer and test it with ICMP echo requests (also known as _pings_). 
 
-We will take a look at the headers of IPv4 and ICMPv4, and describe how to check their headers for integrity. Some features, such as IP fragmentation, are left as an exercise for the reader.
+We will take a look at the headers of IPv4 and ICMPv4, and describe how to check them for integrity. Some features, such as IP fragmentation, are left as an exercise for the reader.
 
-For our networking stack IPv4 was chosen over IPv6 since it is still the default protocol in the Internet. However, this is changing fast[^ipv6-adoption] and IPv6 is planned to be added to our networking stack after the TCP implementation.
+For our networking stack IPv4 was chosen over IPv6 since it is still the default network protocol for the Internet. However, this is changing fast[^ipv6-adoption] and our networking stack can be extended with IPv6 in the future.
 
 # Contents
 {:.no_toc}
@@ -21,11 +21,11 @@ For our networking stack IPv4 was chosen over IPv6 since it is still the default
 
 # Internet Protocol version 4
 
-The next networking layer (L3)[^osi-model] in our implementation, after Ethernet frames, handles the delivery of data to a destination. Namely, the _Internet Protocol_ was invented to provide a base for higher level protocols, such as TCP and UDP. IP is connectionless, meaning that unlike TCP, all of the datagrams are handled independently of each other in the networking stack. This also means, that IP datagrams may arrive out-of-order.[^stevens-tcpip]
+The next layer (L3)[^osi-model] in our implementation, after Ethernet frames, handles the delivery of data to a destination. Namely, the _Internet Protocol_ (IP) was invented to provide a base for transport protocols such as TCP and UDP. IP is connectionless, meaning that unlike TCP, all of the datagrams are handled independently of each other in the networking stack. This also means that IP datagrams may arrive out-of-order.[^stevens-tcpip]
 
-Furthermore, IP does not guarantee successful delivery. This is a conscious choice taken by the protocol designers, since IP is meant to provide a base for protocols that likewise do not guarantee delivery.
+Furthermore, IP does not guarantee successful delivery. This is a conscious choice taken by the protocol designers, since IP is meant to provide a base for protocols that likewise do not guarantee delivery. UDP is one such protocol.
 
-If reliability between the communicating parties is required, a protocol such as TCP is used on top of IP.
+If reliability between the communicating parties is required, a protocol such as TCP is used on top of IP. In that case, the higher level protocol is responsible for detecting missing data and making sure all of it is delivered.
 
 ## Header Format
 
@@ -48,27 +48,27 @@ struct iphdr {
 } __attribute__((packed));
 {% endhighlight %}
 
-The 4-bit `version` field indicates the format of the internet header. In our case, this will be the value 4 for IPv4.
+The 4-bit `version` field indicates the format of the Internet header. In our case, the value will be 4 for IPv4.
 
 The _Internet Header Length_ field `ihl` is likewise 4 bits in length and indicates the number of 32-bit _words_ in the IP header. Because the field is 4 bits in size, it can only hold a maximum value of 15. Thus the maximum length of an IP header is 60 octets (15 times 32 divided by eight).
 
-The _type of service_ field `tos` originates from the original IP specification[^ipv4-spec]. It has been divided into smaller fields in later specifications, but for simplicity's sake, we will treat the field as defined in the original specification. The field communicates the quality of service intended for the IP datagram.  
+The _type of service_ field `tos` originates from the first IP specification[^ipv4-spec]. It has been divided into smaller fields in later specifications, but for simplicity's sake, we will treat the field as defined in the original specification. The field communicates the quality of service intended for the IP datagram.  
 
 The _total length_ field `len`  communicates the length of the whole IP datagram. As it is a 16-bit field, its maximum value is 65535. Large IP datagrams are subject to fragmentation, in which they are split into smaller datagrams in order to satisfy the _Maximum Transmission Unit_ (MTU) of different communication interfaces.
 
-The `id` field is used to index the datagram and is ultimately used for reassembly of fragmented IP datagrams. The field's value is simply a counter that is incremented by the sending party. In turn, the receiving end then knows how to order the incoming datagrams.
+The `id` field is used to index the datagram and is ultimately used for reassembly of fragmented IP datagrams. The field's value is simply a counter that is incremented by the sending party. In turn, the receiving side knows how to order the incoming fragments.
 
 The `flags` field defines various control flags of the datagram. In specific, the sender can specify whether the datagram is allowed to be fragmented, whether it is the last fragment or that there's more fragments incoming.
 
 The _fragment offset_ field, `frag_offset`, indicates the position of the fragment in a datagram. Naturally, the first datagram has this index set to 0.
 
-The `ttl` or `time-to-live` is a common attribute that is used to count down the datagram's lifetime. It is usually set to 64 by the original sender, and every receiver decrements this counter by one. When it hits zero, the datagram is to be discarded and possibly an ICMP message is replied back to indicate an error.
+The `ttl` or _time to live_ is a common attribute that is used to count down the datagram's lifetime. It is usually set to 64 by the original sender, and every receiver decrements this counter by one. When it hits zero, the datagram is to be discarded and possibly an ICMP message is replied back to indicate an error.
 
 The `proto` field provides the datagram an inherent ability to carry other protocols in its payload. The field usually contains values such as 16 (UDP) or 6 (TCP), and is simply used to communicate the type of the actual data to the receiver. 
 
 The _header checksum_ field, `csum`, is used to verify the integrity of the IP header. The algorithm for it is relatively simple, and will be explained further down in this tutorial.
 
-Finally, the `saddr` and `daddr` fields indicate the source and destination addresses of the datagram, respectively. Even though the fields are 32-bit in length and thus provide a pool of approximately 4.5 billion addresses, the address range is still going to be exhausted. The IPv6 protocol extends this length to 128 bits and as a result, future-proofs the address range of the Internet Protocol, perhaps permanently.
+Finally, the `saddr` and `daddr` fields indicate the source and destination addresses of the datagram, respectively. Even though the fields are 32-bit in length and thus provide a pool of approximately 4.5 billion addresses, the address range is going to be exhausted in the near-future[^ipv4-exhaustion]. The IPv6 protocol extends this length to 128 bits and as a result, future-proofs the address range of the Internet Protocol, perhaps permanently.
 
 ## Internet Checksum
 
@@ -137,7 +137,7 @@ Here, the `type` field communicates the purpose of the message. 42 different[^ia
 
 The `code` field further describes the meaning of the message. For example, when the type is 3 (Destination Unreachable), the code-field implies the reason. A common error is when a packet cannot be routed to a network: the originating host then most likely receives an ICMP message with the type 3 and code 0 (Net Unreachable).
 
-The `csum` field is the same checksum field as in the IPv4 header, and the same algorithm can be used to calculate it. In ICMPv4 however, the payload is also included into the checksum.
+The `csum` field is the same checksum field as in the IPv4 header, and the same algorithm can be used to calculate it. In ICMPv4 however, the checksum is _end-to-end_, meaning that also the payload is included when calculating the checksum.
 
 ## Messages and their processing
 
@@ -192,9 +192,11 @@ rtt min/avg/max/mdev = 0.150/0.180/0.200/0.024 ms
 
 A minimum viable networking stack that handles Ethernet frames, ARP and IP can be created relatively easily. However, the original specifications have been extended with many new ones. In this post, we skimmed over IP features such as options, fragmentation and the header DCN and DS fields.
 
-The code for the project can be found from TODO: link
+Furthermore, IPv6 is crucial for the future of the Internet. It is not yet ubiquitous but being a newer protocol than IPv4, it definitely is something that should be implemented in our networking stack.
 
-In the next blog post, we will advance to the next network layer (L4), and start implementing the notorious _Transmission Control Protocol_ (TCP).
+The code for this blog post can be found from TODO: link
+
+In the next blog post we will advance to the transport layer (L4) and start implementing the notorious _Transmission Control Protocol_ (TCP). Namely, TCP is a connection-oriented protocol and ensures reliability between both communicating sides. These aspects obviously bring about more complexity, and being an old protocol, TCP has its dark corners.
 
 # Sources
 [^tcp-roadmap]:<https://tools.ietf.org/html/rfc7414>
@@ -205,3 +207,4 @@ In the next blog post, we will advance to the next network layer (L4), and start
 [^stevens-tcpip]:<https://en.wikipedia.org/wiki/TCP/IP_Illustrated#Volume_1:_The_Protocols>
 [^osi-model]:<https://en.wikipedia.org/wiki/OSI_model>
 [^ipv6-adoption]:<https://en.wikipedia.org/wiki/IPv6_deployment>
+[^ipv4-exhaustion]:<https://en.wikipedia.org/wiki/IPv4_address_exhaustion>
