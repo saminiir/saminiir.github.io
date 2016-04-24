@@ -194,7 +194,7 @@ A minimum viable networking stack that handles Ethernet frames, ARP and IP can b
 
 Furthermore, IPv6 is crucial for the future of the Internet. It is not yet ubiquitous but being a newer protocol than IPv4, it definitely is something that should be implemented in our networking stack.
 
-The code for this blog post can be found from TODO: link
+The source code for this blog post can be found at [GitHub](https://github.com/saminiir/level-ip).
 
 In the next blog post we will advance to the transport layer (L4) and start implementing the notorious _Transmission Control Protocol_ (TCP). Namely, TCP is a connection-oriented protocol and ensures reliability between both communicating sides. These aspects obviously bring about more complexity, and being an old protocol, TCP has its dark corners.
 
