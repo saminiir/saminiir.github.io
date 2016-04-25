@@ -9,13 +9,44 @@ description: "This time in our tutorial userspace TCP/IP stack we will implement
 
 This time in our userspace TCP/IP stack we will implement a minimum viable IP layer and test it with ICMP echo requests (also known as _pings_). 
 
+
+packet corruption, packet reordering, packet duplication and packet erasures (drops). To amend this, TCP was designed to provide reliability to the transport layer.
+
 # Contents
 {:.no_toc}
 
 * Will be replaced with the ToC, excluding the "Contents" header
 {:toc}
 
-# Internet Protocol version 4
+# Reliability mechanisms
+
+The actual problem of sending data reliably may seem superficial, but its actual implementation is involved. Mainly, several questions arise regarding error-repair in a datagram-style network:
+
+* How long should the sender wait for an acknowledgement from the receiver?
+* What if the receiver cannot process data as fast as it is sent?
+* What if the network in between (a router, for example) cannot process data as fast as it is sent?
+
+In all of the scenarios, the underlying dangers of packet-switched networks apply - an acknowledgement from the receiver can be corrupted or even lost in transmit, which leaves the sender in a tricky situation.
+
+To combat these problems, several mechanisms can be used. Perhaps the most common is the _sliding window_ technique, where both parties keep an account of the transmitted data. The window data is considered to be sequential (like a slice of an array) and that window "slides" forward as data is processed (and acknowledged) by both sides:
+
+{% highlight bash %}
+
+       Left window edge             Right window edge
+             |                             |
+             |                             |
+---------------------------------------------------------
+...|    3    |    4    |    5    |    6    |    7    |...
+---------------------------------------------------------
+        ^     ^                            ^    ^
+        |      \                          /     |
+        |       \                        /      |
+   Sent and           Window size: 3         Cannot be
+   ACKed                                     sent yet
+   
+{% endhighlight %}
+
+The convenient property of using this kind of sliding window is that it also alleviates the problem of _flow control_. Flow control is required, when the receiver cannot process data as fast it is sent. In this scenario, the size of the sliding window would be negotiated to be lower, resulting in throttled output from the sender. 
 
 # Conclusion
 
