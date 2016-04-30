@@ -6,11 +6,13 @@ categories: cryptography
 permalink: gems-from-man-page-trenches/
 ---
 
-I'm a big fan of UNIX man pages[^1]. They are almost without exception well-written and concise, and the intuition you gain for particular topics when you browse through the man pages is well worth the effort. In contrast, some developers shoot straight to googling something like "How to print date with format in Linux". 
+I'm a big fan of UNIX man pages[^1]. They are almost without exception well-written and concise, and the intuition you gain for particular topics as you browse through the man pages is well worth the effort. In contrast, many developers shoot straight to googling the answer for the problem at hand.
 
-I argue this is counter-intuitive - one ends up with poor StackOverflow answers and the intended use of applications is often left out. Even the "I don't have time for reading through pages of man pages" argument does not hold, since that just stems out of lack of routine with the UNIX environment. 
+I argue this is counter-intuitive - one ends up with poor-quality StackOverflow answers and the intended use of applications is often left as a mystery to the developer.
 
-Without further ado, here's some funny and interesting parts I've discovered in man pages:
+Even the "I don't have time for reading through pages of manuals" argument does not hold, since there's a learning curve involved in navigating man pages - the more you do it, the better you become at it.
+
+Anyway, this post is about funny bits I've found in man pages. Without further ado, here's some of them, in no particular order:
 
 The manpage for gnupg has 
 {% highlight bash %}
@@ -57,7 +59,7 @@ From tcpdump:
 				
 
 
+{% include twitter.html %}
 
-Please share your favorite ones!
-
+# Sources 
 [^1]:<https://en.wikipedia.org/wiki/Man_page>
