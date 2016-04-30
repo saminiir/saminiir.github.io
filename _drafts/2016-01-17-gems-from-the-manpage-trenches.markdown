@@ -49,6 +49,15 @@ have already seen the old tag. In that case you can do one of two things:
    the old one. So just use git tag -f again, as if you hadn’t already published the old one.
 {% endhighlight %}
 
+From tcpdump:
+{% highlight bash %}
+       -f     Print `foreign' IPv4 addresses numerically rather than symbolically (this option  is  intended  to  get  around
+	                 serious brain damage in Sun's NIS server — usually it hangs forever translating non-local internet numbers).
+{% endhighlight %}
+				
+
+
+
 Please share your favorite ones!
 
 [^1]:<https://en.wikipedia.org/wiki/Man_page>
