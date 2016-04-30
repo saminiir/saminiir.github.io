@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Let's code a TCP/IP stack, 3: TCP Handshake"
+title:  "Let's code a TCP/IP stack, 3: TCP Basics & Handshake"
 date:   2016-04-25 09:00:00
 categories: [tcp/ip, tutorial, c programming, ip, icmp, networking, linux]
 permalink: lets-code-tcp-ip-stack-3-tcp-handshake/
@@ -20,7 +20,7 @@ packet corruption, packet reordering, packet duplication and packet erasures (dr
 
 # Reliability mechanisms
 
-The actual problem of sending data reliably may seem superficial, but its actual implementation is involved. Mainly, several questions arise regarding error-repair in a datagram-style network:
+The problem of sending data reliably may seem superficial, but its actual implementation is involved. Mainly, several questions arise regarding error-repair in a datagram-style network:
 
 * How long should the sender wait for an acknowledgement from the receiver?
 * What if the receiver cannot process data as fast as it is sent?
@@ -32,25 +32,34 @@ To combat these problems, several mechanisms can be used. Perhaps the most commo
 
 {% highlight bash %}
 
-       Left window edge             Right window edge
-             |                             |
-             |                             |
----------------------------------------------------------
-...|    3    |    4    |    5    |    6    |    7    |...
----------------------------------------------------------
-        ^     ^                            ^    ^
-        |      \                          /     |
-        |       \                        /      |
-   Sent and           Window size: 3         Cannot be
-   ACKed                                     sent yet
-   
+                 Left window edge             Right window edge
+                       |                             |
+                       |                             |
+          ---------------------------------------------------------
+          ...|    3    |    4    |    5    |    6    |    7    |...
+          ---------------------------------------------------------
+                  ^     ^                            ^    ^
+                  |      \                          /     |
+                  |       \                        /      |
+             Sent and           Window size: 3         Cannot be
+             ACKed                                     sent yet
+            
 {% endhighlight %}
 
-The convenient property of using this kind of sliding window is that it also alleviates the problem of _flow control_. Flow control is required, when the receiver cannot process data as fast it is sent. In this scenario, the size of the sliding window would be negotiated to be lower, resulting in throttled output from the sender. 
+The convenient property of using this kind of a sliding window is that it also alleviates the problem of _flow control_. Flow control is required, when the receiver cannot process data as fast it is sent. In this scenario, the size of the sliding window would be negotiated to be lower, resulting in throttled output from the sender. 
+
+_Congestion control_, on the other hand, helps the networking stacks in between the sender and receiver to not get congested. There are two general methods for this: in the explicit version, the protocol has a field for specifically informing the sender about the congestion status. In the implicit version, the sender tries to guess when the network is congested and should throttle its output. Overall, congestion control is a complex, recurrent networking problem with accompanying research still being done to this day.[^stevens-tcpip]
+
+# TCP Basics
+
+TCP is a connection-oriented protocol.
+TCP is a streaming protocol. 
+TCP guarantees the application that data is received in-order.
+TCP has a three-way handshake.
 
 # TCP Header Format
 
-The TCP header is 20 octets in size[^tcp-spec]:
+The TCP header is 20 octets in size[^tcpdump-man]:
 
 {% highlight bash %}
         0                            15                              31
@@ -67,6 +76,8 @@ The TCP header is 20 octets in size[^tcp-spec]:
        -----------------------------------------------------------------
 {% endhighlight %}
 
+# Testing the TCP Handshake
+
 # Conclusion
 
 {% include twitter.html %}
@@ -74,3 +85,5 @@ The TCP header is 20 octets in size[^tcp-spec]:
 # Sources
 [^tcp-roadmap]:<https://tools.ietf.org/html/rfc7414>
 [^tcp-spec]:<https://www.ietf.org/rfc/rfc793.txt> 
+[^stevens-tcpip]:<https://en.wikipedia.org/wiki/TCP/IP_Illustrated#Volume_1:_The_Protocols>
+[^tcpdump-man]:<http://www.tcpdump.org/tcpdump_man.html>
