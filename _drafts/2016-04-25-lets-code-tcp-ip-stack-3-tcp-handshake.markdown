@@ -48,9 +48,29 @@ To combat these problems, several mechanisms can be used. Perhaps the most commo
 
 The convenient property of using this kind of sliding window is that it also alleviates the problem of _flow control_. Flow control is required, when the receiver cannot process data as fast it is sent. In this scenario, the size of the sliding window would be negotiated to be lower, resulting in throttled output from the sender. 
 
+# TCP Header Format
+
+The TCP header is 20 octets in size[^tcp-spec]:
+
+{% highlight bash %}
+        0                            15                              31
+       -----------------------------------------------------------------
+       |          source port          |       destination port        |
+       -----------------------------------------------------------------
+       |                        sequence number                        |
+       -----------------------------------------------------------------
+       |                     acknowledgment number                     |
+       -----------------------------------------------------------------
+       |  HL   | rsvd  |C|E|U|A|P|R|S|F|        window size            |
+       -----------------------------------------------------------------
+       |         TCP checksum          |       urgent pointer          |
+       -----------------------------------------------------------------
+{% endhighlight %}
+
 # Conclusion
 
 {% include twitter.html %}
 
 # Sources
 [^tcp-roadmap]:<https://tools.ietf.org/html/rfc7414>
+[^tcp-spec]:<https://www.ietf.org/rfc/rfc793.txt> 
