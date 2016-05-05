@@ -59,6 +59,8 @@ TCP has a three-way handshake.
 
 # TCP Header Format
 
+As always, we'll define the message header and describe its fields. The TCP header is seemingly simple, but contains a lot of information about the communication state.
+
 The TCP header is 20 octets in size[^tcpdump-man]:
 
 {% highlight bash %}
@@ -75,6 +77,42 @@ The TCP header is 20 octets in size[^tcpdump-man]:
        |         TCP checksum          |       urgent pointer          |
        -----------------------------------------------------------------
 {% endhighlight %}
+
+The _Source Port_ and _Destination Port_ fields are used to establish multiple connections from and to hosts. Namely, the Berkeley sockets are the prevalent interface for applications to bind to the TCP networking stack. Through ports, the networking stack knows where to direct the traffic to. As the fields are 16 bits in size, the port values range from 0 to 65535.
+
+Since every bytes in the stream is numbered, the _Sequence Number_ represents the  
+
+The _Acknowledgment number_ contains the window's index of the next byte the sender expects to receive.
+
+The _Header Length_ (HL) field presents the length of the header in 32-bit words.
+
+Next, several flags are presented. The first 4 bits (_rsvd_) are not used.
+
+Then, _Congestion Window Reduced_ (C) is used for informing that the sender reduced its sending rate.
+
+_ECN Echo_ (E) informs that the sender received a congestion notification.
+
+_Urgent Pointer_ (U) indicates that the segment contains prioritized data.
+
+_ACK_ (A) field is used to communicate the state of the TCP handshake. It stays on for the remainder of the connection.
+
+_PSH_ (P) is used to indicate that the receiver should "push" the data to the application as soon as possible.
+
+_RST_ (R) resets the TCP connection.
+
+_SYN_ (S) is used to synchronize sequence numbers in the initial handshake.
+
+_FIN_ (F) indicates that the sender has finished sending data.
+
+The _Window Size_ field is used to advertise the window size. In other words, this is the number of bytes the receiver is willing to accept. Since it is a 16-bit field, the maximum window size is 65,535 bytes.
+
+The _TCP Checksum_ field is used to verify the integrity of the TCP segment. The algorithm is the same as for the Internet Protocol, but the input segment also contains the TCP data and also a pseudo-header from the IP datagram. 
+
+The _Urgent Pointer_ is used when the U-flag is set. The pointer indicates the position of the urgent data in the stream.
+
+After the header, several options can be provided. An example of these options is the _Maximum Segment Size_ (MSS), where the sender informs the other side of the maximum size of the segments.
+
+After the possible options, the actual data follows. The data, however, is not required. For example, the handshake is accomplished with only TCP headers.
 
 # Testing the TCP Handshake
 
