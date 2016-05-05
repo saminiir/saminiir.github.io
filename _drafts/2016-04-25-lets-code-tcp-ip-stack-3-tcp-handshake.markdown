@@ -52,10 +52,19 @@ _Congestion control_, on the other hand, helps the networking stacks in between 
 
 # TCP Basics
 
-TCP is a connection-oriented protocol.
-TCP is a streaming protocol. 
-TCP guarantees the application that data is received in-order.
-TCP has a three-way handshake.
+The underlying mechanisms in TCP are much more involved than in other protocols like UDP and IP. Namely, TCP is a _connection-oriented_ protocol, which means that an unicast communication channel is established between exactly two sides as a first step. This connection is being actively taken care of by both sides: Establishing the connection (Handshaking), informing the other party of the data's state and possible problems.
+
+The other important property of TCP is that it is a _streaming_ protocol. Unlike UDP, TCP does not guarantee applications steady "chunks" of data as they are sent and received. Rather, the TCP implementation has to buffer the data and when packets get lost, reordered or corrupted, TCP has to wait and organize the the data in the buffer. Only when the data is deemed intact, TCP can hand the data over to the application's socket. 
+
+As TCP operates on data as a stream, the "chunks" from the stream have to be converted into packets that IP can carry. This is called _packetization_, where the TCP header contains the sequence number of the current index in the stream. This also has the convenient property that the stream can be broken into many variable-sized segments and TCP then knows how to _repacketize_ them.
+
+Similarly to IP, TCP also checks the message for integrity. This is achieved through the same checksum algorithm as in IP, but with added details. Mainly, the checksum is end-to-end, meaning that both the header and the data are included to the checksumming. In addition, a pseudo-header built from the IP header is included. 
+
+If a TCP implementation receives corrupted segments, it discards them and does not notify the sender. This error is corrected by a timer set by the sender, which can be used to retransmit a segment if it was never acknowledged by the receiver. 
+
+TCP is also a _full-duplex_ system, meaning that traffic can flow simultaneously in both direction. This means that the communicating sides have to keep the sequencing of data to both directions in memory. In more depth, TCP preserves its traffic footprint by including an acknowledgement for the opposite traffic in the segments it sends.
+
+In essence, the sequencing of the data stream is the main principle of TCP. The problem of keeping it synchronized, however, is not a simple one. 
 
 # TCP Header Format
 
