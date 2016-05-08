@@ -123,6 +123,48 @@ After the header, several options can be provided. An example of these options i
 
 After the possible options, the actual data follows. The data, however, is not required. For example, the handshake is accomplished with only TCP headers.
 
+# TCP Handshake
+
+A TCP connection usually undergoes the following phases: connection setup (handshaking), data transfer and closing of the connection. The following diagrams depicts the usual handshaking routine of TCP:
+
+{% highlight bash %}
+          TCP A                                                TCP B
+    	  
+    1.  CLOSED                                               LISTEN
+    	
+    2.  SYN-SENT    --> <SEQ=100><CTL=SYN>               --> SYN-RECEIVED
+    	  
+    3.  ESTABLISHED <-- <SEQ=300><ACK=101><CTL=SYN,ACK>  <-- SYN-RECEIVED
+    			
+    4.  ESTABLISHED --> <SEQ=101><ACK=301><CTL=ACK>       --> ESTABLISHED
+    			  
+    5.  ESTABLISHED --> <SEQ=101><ACK=301><CTL=ACK><DATA> --> ESTABLISHED
+
+{% endhighlight %}
+1. Host A's socket is in a closed state, which means it is not accepting connections. On the contrary, host B's socket that is bound to a specific port is listening for new connections.
+
+2. Host A intends to initiate a connection with host B. Thus, A crafts a TCP segment that has its SYN flag set and also the Sequence field populated with a value (100).
+
+3. Host B responds with a TCP segment that has its SYN and ACK fields set, and acknowledges A's Sequence number by adding 1 to it (ACK=101). Likewise, B generates a sequence number (300).
+
+4. The 3-way handshake is finished by an ACK from the originator (A) of the connection request. The Acknowledgement field reflects the sequence number the host next expects to receive from the other side.
+
+5. Data starts to flow, mainly because both sides have acknowledged each other's segment numbers.
+
+This is the common scenario of establishing a TCP connection. However, several questions arise:
+
+1. How is the initial Sequence number chosen?
+2. What if both sides request a connection for each other at the same time? 
+3. What if segments are delayed for some time or indefinitely? 
+
+The _Initial Sequence Number_ (ISN) is chosen independently by both communication parties at first contact. As it is a crucial part of identifying the connection, it has to be chosen so that it is most likely unique and not easily guessable. Indeed, the _TCP Sequence Number Attack_[^tcp-seq-num-attack] is the situation when an attacker can replicate a TCP connection and effectively feeding data to the target.
+
+The original specification suggests that the ISN is chosen by a counter that increments each 4 microseconds. This, however, can be guessed by an attacker. In reality, modern networking stacks generate the ISN by more complicated methods.
+
+The situation where both endpoints receive a connection request (SYN) from each other is called a _Simultaneous Open_. This is solved by an extra message exchange in the TCP handshake: Both sides send an ACK (without knowing that the other side has done it as well), and both sides SYN-ACK the requests. After this, data transfer commences. 
+
+Lastly, the TCP implementation has to have a timer for knowing when to give up on establishing a connection. Attempts are made to re-establish the connection, usually with an exponential backoff, but once the maximum retries or the time threshold is met, the connection is deemed to be non-existant
+
 # Testing the TCP Handshake
 
 # Conclusion
@@ -134,3 +176,4 @@ After the possible options, the actual data follows. The data, however, is not r
 [^tcp-spec]:<https://www.ietf.org/rfc/rfc793.txt> 
 [^stevens-tcpip]:<https://en.wikipedia.org/wiki/TCP/IP_Illustrated#Volume_1:_The_Protocols>
 [^tcpdump-man]:<http://www.tcpdump.org/tcpdump_man.html>
+[^tcp-seq-num-attack]:<http://www.ietf.org/rfc/rfc1948.txt>
