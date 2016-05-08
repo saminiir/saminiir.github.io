@@ -167,6 +167,22 @@ Lastly, the TCP implementation has to have a timer for knowing when to give up o
 
 # Testing the TCP Handshake
 
+Now that we have the TCP handshake routine mocked and it effectively listens for every port, let's test it:
+
+{% highlight bash %}
+[saminiir@localhost ~]$ nmap -Pn 10.0.0.4 -p 1337
+
+Starting Nmap 7.00 ( https://nmap.org ) at 2016-05-08 19:02 EEST
+Nmap scan report for 10.0.0.4
+Host is up (0.00041s latency).
+PORT     STATE SERVICE
+1337/tcp open  waste
+
+Nmap done: 1 IP address (1 host up) scanned in 0.05 seconds
+{% endhighlight %}
+
+Because of the fact that nmap does a SYN-scan (it only waits for the SYN-ACK to decide if the target's port is open), it is easy to fool it to think we have an application listening on the port by just returning a SYN-ACK TCP segment.
+
 # Conclusion
 
 {% include twitter.html %}
