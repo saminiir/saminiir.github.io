@@ -185,6 +185,12 @@ Because of the fact that nmap does a SYN-scan (it only waits for the SYN-ACK to 
 
 # Conclusion
 
+The minimum viable TCP handshake routine can be done relatively effortless by just picking a Sequence number, setting the SYN-ACK flags and calculating the checksum for the resulting TCP segment. 
+
+Next time, we'll start looking at the Berkeley Socket API. This is the prevalent interface for applications to bind to the host operating system's networking stack. We'll see and try if we can mock the socket API for a small application and thus use our networking stack to actually communicate.
+
+We also have to look into the more complex parts of TCP: window management.
+
 {% include twitter.html %}
 
 # Sources
