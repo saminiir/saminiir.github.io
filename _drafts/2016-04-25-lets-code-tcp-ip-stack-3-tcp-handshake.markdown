@@ -72,7 +72,7 @@ In essence, the sequencing of the data stream is the main principle of TCP. The 
 
 # TCP Header Format
 
-As always, we'll define the message header and describe its fields. The TCP header is seemingly simple, but contains a lot of information about the communication state.
+Next, we'll define the message header and describe its fields. The TCP header is seemingly simple, but contains a lot of information about the communication state.
 
 The TCP header is 20 octets in size[^tcpdump-man]:
 
@@ -101,21 +101,21 @@ The _Header Length_ (HL) field presents the length of the header in 32-bit words
 
 Next, several flags are presented. The first 4 bits (_rsvd_) are not used.
 
-Then, _Congestion Window Reduced_ (C) is used for informing that the sender reduced its sending rate.
+1. _Congestion Window Reduced_ (C) is used for informing that the sender reduced its sending rate.
 
-_ECN Echo_ (E) informs that the sender received a congestion notification.
+1. _ECN Echo_ (E) informs that the sender received a congestion notification.
 
-_Urgent Pointer_ (U) indicates that the segment contains prioritized data.
+1. _Urgent Pointer_ (U) indicates that the segment contains prioritized data.
 
-_ACK_ (A) field is used to communicate the state of the TCP handshake. It stays on for the remainder of the connection.
+1. _ACK_ (A) field is used to communicate the state of the TCP handshake. It stays on for the remainder of the connection.
 
-_PSH_ (P) is used to indicate that the receiver should "push" the data to the application as soon as possible.
+1. _PSH_ (P) is used to indicate that the receiver should "push" the data to the application as soon as possible.
 
-_RST_ (R) resets the TCP connection.
+1. _RST_ (R) resets the TCP connection.
 
-_SYN_ (S) is used to synchronize sequence numbers in the initial handshake.
+1. _SYN_ (S) is used to synchronize sequence numbers in the initial handshake.
 
-_FIN_ (F) indicates that the sender has finished sending data.
+1. _FIN_ (F) indicates that the sender has finished sending data.
 
 The _Window Size_ field is used to advertise the window size. In other words, this is the number of bytes the receiver is willing to accept. Since it is a 16-bit field, the maximum window size is 65,535 bytes.
 
@@ -161,13 +161,14 @@ This is the common scenario of establishing a TCP connection. However, several q
 2. What if both sides request a connection for each other at the same time? 
 3. What if segments are delayed for some time or indefinitely? 
 
-The _Initial Sequence Number_ (ISN) is chosen independently by both communication parties at first contact. As it is a crucial part of identifying the connection, it has to be chosen so that it is most likely unique and not easily guessable. Indeed, the _TCP Sequence Number Attack_[^tcp-seq-num-attack] is the situation when an attacker can replicate a TCP connection and effectively feeding data to the target.
+The _Initial Sequence Number_ (ISN) is chosen independently by both communication parties at first contact. As it is a crucial part of identifying the connection, it has to be chosen so that it is most likely unique and not easily guessable. Indeed, the _TCP Sequence Number Attack_[^tcp-seq-num-attack] is the situation where an attacker can replicate a TCP connection and effectively feed data to the target, impersonating as a trusted host.
 
-The original specification suggests that the ISN is chosen by a counter that increments each 4 microseconds. This, however, can be guessed by an attacker. In reality, modern networking stacks generate the ISN by more complicated methods.
+The original specification suggests that the ISN is chosen by a counter that increments every 4 microseconds. This, however, can be guessed by an attacker. In reality, modern networking stacks generate the ISN by more complicated methods.
 
 The situation where both endpoints receive a connection request (SYN) from each other is called a _Simultaneous Open_. This is solved by an extra message exchange in the TCP handshake: Both sides send an ACK (without knowing that the other side has done it as well), and both sides SYN-ACK the requests. After this, data transfer commences. 
 
-Lastly, the TCP implementation has to have a timer for knowing when to give up on establishing a connection. Attempts are made to re-establish the connection, usually with an exponential backoff, but once the maximum retries or the time threshold is met, the connection is deemed to be non-existant
+Lastly, the TCP implementation has to have a timer for knowing when to give up on establishing a connection. Attempts are made to re-establish the connection, usually with an exponential backoff, but once the maximum retries or the time threshold is met, the connection is deemed to be non-existant.
+
 
 # Testing the TCP Handshake
 
