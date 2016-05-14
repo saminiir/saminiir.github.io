@@ -169,6 +169,17 @@ The situation where both endpoints receive a connection request (SYN) from each 
 
 Lastly, the TCP implementation has to have a timer for knowing when to give up on establishing a connection. Attempts are made to re-establish the connection, usually with an exponential backoff, but once the maximum retries or the time threshold is met, the connection is deemed to be non-existant.
 
+# TCP Options
+
+The last field in the TCP header segment is reserved for possible TCP options. The original specification provided three options, but later specifications have added many more. Next, we'll look at the most common options.
+
+The _Maximum Segment Size_ (MSS) option informs the maximum TCP segment size the TCP implementation is willing to receive. The typical value for this is 1460 bytes in IPv4.
+
+The _Selective Acknowledgment_ (SACK) option optimizes the scenario when many packets are lost in transmit and the receiver's window of data is filled with "holes". To remedy the resulting degraded throughput, a TCP implementation can inform the sender of the specific packets it did not receive with SACK. Thus, the sender receives the information about this in a more straight-forward manner than with the basic accumulating acknowledment scheme.
+
+The _Window Scale_ option increases the limited 16-bit window size. Namely, if both sides include this option in their handshake segments, the window size is multiplied with this scale. Having bigger window sizes are mainly important for bulk data transfer.
+
+The _Timestamps_ option allows the sender to place a timestamp into the TCP segment, which then can be used to calculate the RTT for each ACK segment. This information can then be used to calculate the TCP retransmission timeout. 
 
 # Testing the TCP Handshake
 
@@ -204,3 +215,5 @@ We also have to look into the more complex parts of TCP: window management.
 [^stevens-tcpip]:<https://en.wikipedia.org/wiki/TCP/IP_Illustrated#Volume_1:_The_Protocols>
 [^tcpdump-man]:<http://www.tcpdump.org/tcpdump_man.html>
 [^tcp-seq-num-attack]:<http://www.ietf.org/rfc/rfc1948.txt>
+[^osi-model]:<https://en.wikipedia.org/wiki/OSI_model>
+[^first-tcp-spec]:<https://tools.ietf.org/html/rfc675>
