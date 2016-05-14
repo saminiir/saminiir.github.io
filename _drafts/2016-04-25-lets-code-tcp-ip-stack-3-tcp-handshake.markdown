@@ -7,10 +7,14 @@ permalink: lets-code-tcp-ip-stack-3-tcp-handshake/
 description: "This time in our tutorial userspace TCP/IP stack we will implement a minimum viable IP layer and test it with ICMP echo requests. We will take a look at the headers of IPv4 and ICMPv4 and describe how to check them for integrity. Some features, such as IP fragmentation, are left as an exercise for the reader."
 ---
 
-This time in our userspace TCP/IP stack we will implement a minimum viable IP layer and test it with ICMP echo requests (also known as _pings_). 
+Now that our userspace TCP/IP stack has minimal implementations for Ethernet and IPv4, it is time to look into the dreaded Transmission Control Protocol (TCP). 
 
+Operating on the fourth OSI networking layer[^osi-model], _transport_, TCP is responsible for repairing erroneous connections and faults in packet delivery. Indeed, TCP is the workhorse of the Internet, providing reliable communications in virtually all computer networking today.
 
-packet corruption, packet reordering, packet duplication and packet erasures (drops). To amend this, TCP was designed to provide reliability to the transport layer.
+TCP is not exactly a fresh protocol - the first specification came out in 1974[^first-tcp-spec]. A lot of has changed since then and TCP has acquired many extensions and corrections[^tcp-roadmap]. 
+
+This post will delve into the basic theory behind TCP and attempts to give motivation for the design decisions in it. Furthermore, we will look into the TCP header and discuss establishing a connection (TCP handshaking). As the last step, we'll demonstrate the first functionality of TCP in our networking stack. 
+
 
 # Contents
 {:.no_toc}
