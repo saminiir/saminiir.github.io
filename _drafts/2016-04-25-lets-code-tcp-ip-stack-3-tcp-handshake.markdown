@@ -4,7 +4,7 @@ title:  "Let's code a TCP/IP stack, 3: TCP Basics & Handshake"
 date:   2016-05-15 09:00:00
 categories: [tcp/ip, tutorial, c programming, ip, networking, linux]
 permalink: lets-code-tcp-ip-stack-3-tcp-handshake/
-description: "Now that our userspace TCP/IP stack has minimal implementations for Ethernet and IPv4, it is time to look into the dreaded Transmission Control Protocol (TCP). Operating on the fourth OSI networking layer, transport, TCP is responsible for repairing erroneous connections and faults in packet delivery. Indeed, TCP is the workhorse of the Internet, providing reliable communications in virtually all computer networking today."
+description: "Now that our userspace TCP/IP stack has minimal implementations for Ethernet and IPv4, it is time to look into the dreaded Transmission Control Protocol (TCP). Operating on the fourth OSI networking layer, transport, TCP is responsible for repairing erroneous connections and faults in packet delivery."
 ---
 
 Now that our userspace TCP/IP stack has minimal implementations for Ethernet and IPv4, it is time to look into the dreaded Transmission Control Protocol (TCP). 
