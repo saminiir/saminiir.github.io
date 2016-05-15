@@ -11,9 +11,9 @@ Now that our userspace TCP/IP stack has minimal implementations for Ethernet and
 
 Operating on the fourth OSI networking layer[^osi-model], _transport_, TCP is responsible for repairing erroneous connections and faults in packet delivery. Indeed, TCP is the workhorse of the Internet, providing reliable communications in virtually all computer networking today.
 
-TCP is not exactly a fresh protocol - the first specification came out in 1974[^first-tcp-spec]. A lot of has changed since then and TCP has acquired many extensions and corrections[^tcp-roadmap]. 
+TCP is not exactly a new protocol - the first specification came out in 1974[^first-tcp-spec]. A lot of has changed since then and TCP has acquired many extensions and corrections[^tcp-roadmap]. 
 
-This post will delve into the basic theory behind TCP and attempts to give motivation for the design decisions in it. Furthermore, we will look into the TCP header and discuss establishing a connection (TCP handshaking). As the last step, we'll demonstrate the first functionality of TCP in our networking stack. 
+This post will delve into the basic theory behind TCP and attempts to give motivation for its design. Furthermore, we will look into the TCP header and discuss establishing a connection (TCP handshaking). As the last step, we'll demonstrate the first functionality of TCP in our networking stack. 
 
 
 # Contents
@@ -93,9 +93,9 @@ The TCP header is 20 octets in size[^tcpdump-man]:
 
 The _Source Port_ and _Destination Port_ fields are used to establish multiple connections from and to hosts. Namely, the Berkeley sockets are the prevalent interface for applications to bind to the TCP networking stack. Through ports, the networking stack knows where to direct the traffic to. As the fields are 16 bits in size, the port values range from 0 to 65535.
 
-Since every bytes in the stream is numbered, the _Sequence Number_ represents the  
+Since every byte in the stream is numbered, the _Sequence Number_ represents the TCP segment's window index. When handshaking, this contains the _Initial Sequence Number_ (ISN).
 
-The _Acknowledgment number_ contains the window's index of the next byte the sender expects to receive.
+The _Acknowledgment Number_ contains the window's index of the next byte the sender expects to receive. After the handshake, the ACK field must always be populated.
 
 The _Header Length_ (HL) field presents the length of the header in 32-bit words.
 
@@ -175,7 +175,7 @@ The last field in the TCP header segment is reserved for possible TCP options. T
 
 The _Maximum Segment Size_ (MSS) option informs the maximum TCP segment size the TCP implementation is willing to receive. The typical value for this is 1460 bytes in IPv4.
 
-The _Selective Acknowledgment_ (SACK) option optimizes the scenario when many packets are lost in transmit and the receiver's window of data is filled with "holes". To remedy the resulting degraded throughput, a TCP implementation can inform the sender of the specific packets it did not receive with SACK. Thus, the sender receives the information about this in a more straight-forward manner than with the basic accumulating acknowledment scheme.
+The _Selective Acknowledgment_ (SACK) option optimizes the scenario when many packets are lost in transmit and the receiver's window of data is filled with "holes". To remedy the resulting degraded throughput, a TCP implementation can inform the sender of the specific packets it did not receive with SACK. Thus, the sender receives information about the state of the data in a more straight-forward manner than with the accumulating acknowledment scheme.
 
 The _Window Scale_ option increases the limited 16-bit window size. Namely, if both sides include this option in their handshake segments, the window size is multiplied with this scale. Having bigger window sizes are mainly important for bulk data transfer.
 
@@ -203,9 +203,9 @@ Because of the fact that nmap does a SYN-scan (it only waits for the SYN-ACK to 
 
 The minimum viable TCP handshake routine can be done relatively effortless by just picking a Sequence number, setting the SYN-ACK flags and calculating the checksum for the resulting TCP segment. 
 
-Next time, we'll start looking at the Berkeley Socket API. This is the prevalent interface for applications to bind to the host operating system's networking stack. We'll see and try if we can mock the socket API for a small application and thus use our networking stack to actually communicate.
+Next time, we'll look into the most important responsibility of TCP: Reliable data transfer. Managing the window of the stream is essential for transmitting data with TCP and the logic for it can get somewhat complex. 
 
-We also have to look into the more complex parts of TCP: window management.
+Furthermore, providing applications a way to bind to the TCP implementation is done with _sockets_. Thus, we'll look into the Berkeley Socket API and see if we can mock it for applications, enabling them to use our custom TCP implementation.
 
 {% include twitter.html %}
 
