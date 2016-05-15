@@ -207,6 +207,8 @@ Next time, we'll look into the most important responsibility of TCP: Reliable da
 
 Furthermore, providing applications a way to bind to the TCP implementation is done with _sockets_. Thus, we'll look into the Berkeley Socket API and see if we can mock it for applications, enabling them to use our custom TCP implementation.
 
+The source code for the project is hosted at [GitHub](https://github.com/saminiir/level-ip).
+
 {% include twitter.html %}
 
 # Sources
