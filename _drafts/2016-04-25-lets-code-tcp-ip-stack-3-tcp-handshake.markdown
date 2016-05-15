@@ -1,10 +1,10 @@
 ---
 layout: post
 title:  "Let's code a TCP/IP stack, 3: TCP Basics & Handshake"
-date:   2016-04-25 09:00:00
-categories: [tcp/ip, tutorial, c programming, ip, icmp, networking, linux]
+date:   2016-05-15 09:00:00
+categories: [tcp/ip, tutorial, c programming, ip, networking, linux]
 permalink: lets-code-tcp-ip-stack-3-tcp-handshake/
-description: "This time in our tutorial userspace TCP/IP stack we will implement a minimum viable IP layer and test it with ICMP echo requests. We will take a look at the headers of IPv4 and ICMPv4 and describe how to check them for integrity. Some features, such as IP fragmentation, are left as an exercise for the reader."
+description: "Now that our userspace TCP/IP stack has minimal implementations for Ethernet and IPv4, it is time to look into the dreaded Transmission Control Protocol (TCP). Operating on the fourth OSI networking layer, transport, TCP is responsible for repairing erroneous connections and faults in packet delivery. Indeed, TCP is the workhorse of the Internet, providing reliable communications in virtually all computer networking today."
 ---
 
 Now that our userspace TCP/IP stack has minimal implementations for Ethernet and IPv4, it is time to look into the dreaded Transmission Control Protocol (TCP). 
