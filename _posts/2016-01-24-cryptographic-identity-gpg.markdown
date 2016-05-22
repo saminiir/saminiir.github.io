@@ -297,6 +297,23 @@ gpg> revkey
 
 Again, do not delete revoked keys. They are still useful to decrypt data previously encrypted with the old key.
 
+## Distributing an encryption subkey
+
+For distributed usage, a subkey can be created for each usage purpose. 
+
+For example, to encrypt and decrypt your password manager files both in your phone and laptop, transfer the generated encryption subkey to the phone like so:
+
+{% highlight bash %}
+
+# generate a strong random password
+$ gpg2 --armor --gen-random 1 20
+$ gpg2 --armor --export-secret-keys $SUBKEY_ID | gpg2 --armor --symmetric --output encsubkey.sec.asc
+{% endhighlight %}
+
+After that, transfer the `encsubkey.sec.asc` via a secure mechanism, e.g. a flash storage, to the new device.
+
+Never transfer private keys through the internet, and strive for isolated environments where the transfer is done.
+
 {% include twitter.html %}
 
 # Notes
