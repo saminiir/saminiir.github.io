@@ -237,9 +237,40 @@ And you're done setting up your GPG configuration! The following section depicts
 
 # Scenarios
 
+## Importing the primary secret key
+
+Since you need the primary secret key for many operations, like signing new keys, it needs to be imported from the safe storage medium back to your keychain:
+
+{% highlight bash %}
+$ mount /dev/sdb /mnt/usb
+$ losetup --find --show /mnt/usb/disk.img
+/dev/loop0
+$ cryptsetup open /dev/loop0 usb
+$ mount /dev/mapper/usb /media/encrypted
+{% endhighlight %}
+
+Replace the devices file descriptors with the correct ones.
+
+Then, import the primary secret key:
+
+{% highlight bash %}
+$ gpg2 --homedir /media/encrypted/.gnupg --export-secret-keys --armor $KEYID > privkey
+$ gpg2 --import privkey
+{% endhighlight %}
+
+After finishing with key manipulation, delete the private key from the keychain:
+
+{% highlight bash %}
+# Get the keygrip of the key to be deleted
+$ gpg2 -K --with-keygrip
+$ rm .gnupg/private-keys-v1.d/$keygrip.key
+# Make sure the older gpg format, secring.gpg, is empty and does not contain the key
+$ ls -l .gnupg/secring.gpg 
+{% endhighlight %}
+
 ## New subkey
 
-Create a new subkey with the steps outlined above. You'll need your master keypair that is stashed away to certify the new subkey.
+Create a new subkey. You'll need your master keypair that is stashed away to certify the new subkey.
 
 ## Signing keys
 
