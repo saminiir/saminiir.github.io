@@ -57,6 +57,12 @@ From tcpdump:
 	                 serious brain damage in Sun's NIS server — usually it hangs forever translating non-local internet numbers).
 {% endhighlight %}
 				
+The developers of `iptables` have a care-free attitude towards bugs:
+
+{% highlight bash %}
+BUGS
+       Bugs?  What's this? ;-) Well, you might want to have a look at http://bugzilla.netfilter.org/
+{% endhighlight %}
 
 
 {% include twitter.html %}
