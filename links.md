@@ -20,3 +20,4 @@ This page contains links to articles, papers and blog posts I've found insightfu
 - [Scaling in the Linux Networking Stack](https://www.kernel.org/doc/Documentation/networking/scaling.txt)
 - [Embracing Conway's Law](https://wingolog.org/archives/2015/11/09/embracing-conways-law)
 - [20 Years - One Standard: The Story of TCP/IP](http://www.cbi.umn.edu/iterations/spira.html)
+- [The C10K problem](http://www.kegel.com/c10k.html)
