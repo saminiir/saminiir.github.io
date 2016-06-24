@@ -8,11 +8,11 @@ permalink: installing-arch-linux-on-dell-xps-15/
 
 So after using a Fedora/Macbook for a while, I got a new work laptop. This time I opted for the Dell XPS 15 with all the bells and whistles[^dell-xps-15]. It has received great reviews and has been compared to the quality of the Macbook Pro's.
 
-Installing a UNIX distro is always time-consuming and depending on your desires, the configuration varies a lot. This applies especially to bare-bones distros like Arch Linux: It only provides a compiled kernel and a minimal set of system components (systemd). Rest of system layout you have to devise yourself.
+Installing a UNIX distro is always time-consuming and depending on your desires, the configuration varies a lot. This applies especially to bare-bones distros like Arch Linux: It only provides a compiled kernel and a minimal set of system components (systemd). Rest of the system layout you have to devise yourself.
 
 The reason I am documenting this process is that especially with laptops, there are some gotchas that are always a bit arcane. For example, the performance of suspend/hibernation varies greatly depending on the laptop's hardware, as well as other components like the webcam and so on. Thus, if this guide saves anyone (or me) even a bit of head-scratching time, I think it is worth it.
 
-The overall layout of the final system will be:
+The overall layout of the final Arch Linux system will be:
 
 * UEFI for the boot-system
 * GPT for the partition table
@@ -21,7 +21,7 @@ The overall layout of the final system will be:
 * LUKS for full-disk encryption
 * LVM for managing volumes on top of LUKS
 * X11 for the windowing system
-* DWM for the window management
+* DWM for window management
 
 # Contents
 {:.no_toc}
@@ -86,10 +86,148 @@ $ mkfs.ext4 /dev/nvme0n1p2
 
 # Disk encryption: LUKS
 
-Several methods for achieving full disk encryption are available. I chose to use LUKS (dm-crypt), since it is pretty standard and performant in Linux. Furthermore, I chose the method of using the Logical Volume Manager (LVM) on top of the LUKS-encrypted partition[^lvm-on-luks]. No real reason as to why, just that it seemed to be the most simple and robust choice. The major disadvantage of it is that the LVM cannot be used to span multiple volumes. For a laptop, this shouldn't be
-that much of a problem however.
+Several methods for achieving full disk encryption are available. I chose to use LUKS (dm-crypt), since it is pretty standard and performant in Linux. LUKS utilizes block device encryption, meaning that it operates below the filesystem and everything written to the device is guaranteed to be encrypted. LUKS also adds ease-of-use into the key management.
+
+Utilizing full disk encryption is no panacea - you will still be vulnerable to e.g. cold boot attack[^cold-boot], bootloader malware and all other sorts of nasty things. And in the end, if your system is compromized while the disk encryption is unlocked, it is absolutely of no help at that point. I am planning a separate blog post on hardening the boot process.
+
+Encrypt your root partition. Choose a strong passphrase (I prefer the diceware[^diceware] method). Also notice, that cryptsetup requires an uppercased 'yes' for confirmation. :-)
+
+{% highlight bash %}
+
+$ cryptsetup luksFormat /dev/nvme0n1p2
+$ cryptsetup open --type luks /dev/nvme0n1p2 lvm
+
+{% endhighlight %}
 
 # Volume management: LVM
+
+The Arch Linux wiki puts it more concisely than I ever could: 
+
+*Logical Volume Management utilizes the kernel's device-mapper feature to provide a system of partitions independent of underlying disk layout. With LVM you abstract your storage and have "virtual partitions", making extending/shrinking easier (subject to potential filesystem limitations).*[^lvm]
+
+In other words, it just makes your life easier. I chose the method of using the Logical Volume Manager (LVM) on top of the LUKS-encrypted partition[^lvm-on-luks]. No real reason as to why, just that it seemed to be the most simple and robust choice. The major disadvantage of it is that the LVM cannot be used to span multiple physical volumes. For a laptop, this shouldn't be that much of a problem, however.
+
+Let's now create the Physical Volume (pv) and Logical Volumes (lv's) for the main partition layout (swap, root, home):
+
+{% highlight bash %}
+$ pvcreate /dev/mapper/lvm
+
+$ vgcreate MyVol /dev/mapper/lvm
+
+$ lvcreate -L 8G MyVol -n swap
+$ lvcreate -L 25G MyVol -n root
+$ lvcreate -l 100%FREE MyVol -n home
+
+$ mkfs.ext4 /dev/mapper/MyVol-root
+$ mkfs.ext4 /dev/mapper/MyVol-home
+$ mkswap /dev/mapper
+
+$ mount /dev/mapper/MyVol-root /mnt
+$ mkdir /mnt/home
+$ mount /dev/mapper/MyVol-home /mnt/home
+$ swapon /dev/mapper/MyVol-swap
+
+{% endhighlight %}
+
+# Install Arch Linux
+
+Now it is time to install Arch Linux to our root partition.
+
+First, mount your boot partition that we made earlier:
+
+{% highlight bash %}
+
+$ mkdir /mnt/boot
+$ mount /dev/nvmen1p1 /mnt/boot
+
+{% endhighlight %}
+
+Now let's install the Arch base system with `pacstrap`:
+
+{% highlight bash %}
+
+$ pacstrap /mnt base base-devel grub-efi-x86_64
+
+{% endhighlight %}
+
+Other configuration, comments inlined:
+
+{% highlight bash %}
+
+# Generate filesystem information
+$ genfstab -U /mnt >> /mnt/etc/fstab
+
+# Chroot the installation
+$ arch-chroot /mnt /bin/bash
+
+# Uncomment en_US.UTF-8 and generate the locale
+$ vi /etc/locale.gen
+$ locale-gen
+
+# Create locale.conf
+
+$ cat >>/etc/locale.conf
+LANG=en_US.UTF-8
+
+# Set timezone
+$ ln -s /usr/share/zoneinfo/Europe/Helsinki /etc/localtime
+
+# Sync the hardware clock
+$ hwclock --systohc --utc
+
+{% endhighlight %}
+
+Then, configure and regenerate a new initial ramdisk environment:
+
+{% highlight bash %}
+
+# Change to: HOOKS="... encrypt lvm2 ... filesystems ..."
+$ vi /etc/mkinitcpio.conf
+
+# Generate initramfs
+$ mkinitcpio -p linux
+
+{% endhighlight %}
+
+# Boot manager: systemd-boot
+
+systemd-boot is a boot manager for UEFI systems. It only operates on ESPs and EFI-configured images. The project was previously known as 'gummiboot', but was merged into the systemd in May 2015[^systemd-boot].
+
+The kernels we boot with systemd-boot have to be configured with `CONFIG_EFI_STUB` enabled. This allows the UEFI firmware to act as a bootloader and start the kernel, without needing a separate boot loader such as GRUB.
+
+{% highlight bash %}
+
+# Make sure you're booted into EFI mode and can see efivars:
+$ efivar -l
+
+# Make sure your ESP partition (described earlier) is mounted at /boot
+$ mount -l | grep boot
+
+# Install systemd-boot
+$ bootctl install
+
+{% endhighlight %}
+
+After that, you should have a folder `/boot/loader/entries`. Add the following boot entry file there:
+
+{% highlight bash %}
+
+# Get the UUID of your root partition
+$ blkid -s UUID -o value /dev/nvme0n1p2
+
+$ cat >>arch-encrypted-lvm.conf
+title Arch Linux Encrypted LVM
+linux /vmlinuz-linux
+initrd /intel-ucode.img
+initrd /initramfs-linux.img
+options cryptdevice=UUID=<UUID>:MyVol root=/dev/mapper/MyVol-root quiet rw
+{% endhighlight %}
+
+The `initrd /intel-ucode.img` is the microcode for Intel processors - if you have one, install the `intel-ucode` package.
+
+Now you can exit the chroot (`exit`) and reboot. If all went well, you should be asked to unlock the root partition's encryption and be awarded with a login shell.
+
+
 
 # Suspend/hibernate
 
@@ -102,4 +240,7 @@ that much of a problem however.
 # Sources 
 [^dell-xps-15]:<http://www.dell.com/us/p/xps-15-9550-laptop/pd>
 [^lvm-on-luks]:<https://wiki.archlinux.org/index.php/Dm-crypt/Encrypting_an_entire_system#LVM_on_LUKS>
-[^1]:<https://en.wikipedia.org/wiki/Man_page>
+[^cold-boot]:<https://en.wikipedia.org/wiki/Cold_boot_attack>
+[^diceware]:<https://en.wikipedia.org/wiki/Diceware>
+[^lvm]:<https://wiki.archlinux.org/index.php/LVM#LVM_Building_Blocks>
+[^systemd-boot]:<https://www.freedesktop.org/wiki/Software/systemd/systemd-boot/>
