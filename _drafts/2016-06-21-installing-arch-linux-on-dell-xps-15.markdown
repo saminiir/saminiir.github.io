@@ -17,11 +17,9 @@ The overall layout of the final Arch Linux system will be:
 * UEFI for the boot-system
 * GPT for the partition table
 * GRUB for the boot loader
-* Single ext4 root partition
 * LUKS for full-disk encryption
 * LVM for managing volumes on top of LUKS
-* X11 for the windowing system
-* DWM for window management
+* root and home logical volumes (ext4) and a swap volume
 
 # Contents
 {:.no_toc}
@@ -44,7 +42,7 @@ Extra note regarding the NVMe-based SSD drive: I had to change SATA configuratio
 
 Alternatively, you can check out a way of PXE booting Arch Linux from my [previous blog post]({% post_url 2015-04-03-boot-arch-linux-from-rpi %}).
 
-# Partitioning: UEFI, GPT and GRUB
+# Partitioning: UEFI, GPT and ESP
 
 First, wipe the hard disk. This is important for enhancing the security of the disk encryption, since if the disk is full of random data, info about it is harder to deduce:
 
@@ -80,17 +78,13 @@ $ mkfs.fat -F32 -nESP /dev/nvme0n1p1
 $ mkfs.ext4 /dev/nvme0n1p2
 {% endhighlight %}
 
-{% highlight bash %}
-
-{% endhighlight %}
-
 # Disk encryption: LUKS
 
 Several methods for achieving full disk encryption are available. I chose to use LUKS (dm-crypt), since it is pretty standard and performant in Linux. LUKS utilizes block device encryption, meaning that it operates below the filesystem and everything written to the device is guaranteed to be encrypted. LUKS also adds ease-of-use into the key management.
 
 Utilizing full disk encryption is no panacea - you will still be vulnerable to e.g. cold boot attack[^cold-boot], bootloader malware and all other sorts of nasty things. And in the end, if your system is compromized while the disk encryption is unlocked, it is absolutely of no help at that point. I am planning a separate blog post on hardening the boot process.
 
-Encrypt your root partition. Choose a strong passphrase (I prefer the diceware[^diceware] method). Also notice, that cryptsetup requires an uppercased 'yes' for confirmation. :-)
+Encrypt your root partition. Choose a strong passphrase (I prefer the diceware[^diceware] method). Also notice, that cryptsetup requires an uppercase 'yes' for confirmation. :-)
 
 {% highlight bash %}
 
@@ -226,14 +220,6 @@ options cryptdevice=UUID=<UUID>:MyVol root=/dev/mapper/MyVol-root quiet rw
 The `initrd /intel-ucode.img` is the microcode for Intel processors - if you have one, install the `intel-ucode` package.
 
 Now you can exit the chroot (`exit`) and reboot. If all went well, you should be asked to unlock the root partition's encryption and be awarded with a login shell.
-
-
-
-# Suspend/hibernate
-
-/sys/kernel/pm_state
-
-
 
 {% include twitter.html %}
 
