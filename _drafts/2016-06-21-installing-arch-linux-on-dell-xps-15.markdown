@@ -10,8 +10,6 @@ So after using a Fedora/Macbook for a while, I got a new work laptop. This time 
 
 Installing a UNIX distro is always time-consuming and depending on your desires, the configuration varies a lot. This applies especially to bare-bones distros like Arch Linux: It only provides a compiled kernel and a minimal set of system components (systemd). Rest of the system layout you have to devise yourself.
 
-The reason I am documenting this process is that especially with laptops, there are some gotchas that are always a bit arcane. For example, the performance of suspend/hibernation varies greatly depending on the laptop's hardware, as well as other components like the webcam and so on. Thus, if this guide saves anyone (or me) even a bit of head-scratching time, I think it is worth it.
-
 The overall layout of the final Arch Linux system will be:
 
 * UEFI for the boot-system
@@ -159,7 +157,6 @@ $ vi /etc/locale.gen
 $ locale-gen
 
 # Create locale.conf
-
 $ cat >>/etc/locale.conf
 LANG=en_US.UTF-8
 
@@ -185,9 +182,9 @@ $ mkinitcpio -p linux
 
 # Boot manager: systemd-boot
 
-systemd-boot is a boot manager for UEFI systems. It only operates on ESPs and EFI-configured images. The project was previously known as 'gummiboot', but was merged into the systemd in May 2015[^systemd-boot].
+_systemd-boot_ is a boot manager for UEFI systems. It only operates on ESPs and EFI-configured images. The project was previously known as 'gummiboot', but was merged into systemd in May 2015[^systemd-boot].
 
-The kernels we boot with systemd-boot have to be configured with `CONFIG_EFI_STUB` enabled. This allows the UEFI firmware to act as a bootloader and start the kernel, without needing a separate boot loader such as GRUB.
+The kernels we boot with systemd-boot have to be configured with `CONFIG_EFI_STUB` enabled. This allows the UEFI firmware to act as a bootloader and start the kernel, without needing a separate boot loader such as GRUB. Luckily, the Arch Linux kernels have already been configured so.
 
 {% highlight bash %}
 
@@ -220,6 +217,8 @@ options cryptdevice=UUID=<UUID>:MyVol root=/dev/mapper/MyVol-root quiet rw
 The `initrd /intel-ucode.img` is the microcode for Intel processors - if you have one, install the `intel-ucode` package.
 
 Now you can exit the chroot (`exit`) and reboot. If all went well, you should be asked to unlock the root partition's encryption and be awarded with a login shell.
+
+In the next post, I'll describe the steps to configure a straightforward userspace setup for Arch Linux.
 
 {% include twitter.html %}
 
