@@ -1,8 +1,8 @@
 ---
 layout: post
 title:  "Installing Arch Linux on Dell XPS 15"
-date:   2016-06-21 08:00:00
-categories: linux
+date:   2016-06-24 18:00:00
+categories: [linux, arch linux]
 permalink: installing-arch-linux-on-dell-xps-15/
 ---
 
