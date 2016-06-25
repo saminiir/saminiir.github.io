@@ -14,10 +14,10 @@ The overall layout of the final Arch Linux system will be:
 
 * UEFI for the boot-system
 * GPT for the partition table
-* GRUB for the boot loader
 * LUKS for full-disk encryption
 * LVM for managing volumes on top of LUKS
 * root and home logical volumes (ext4) and a swap volume
+* systemd-boot for the boot manager
 
 # Contents
 {:.no_toc}
@@ -138,7 +138,7 @@ Now let's install the Arch base system with `pacstrap`:
 
 {% highlight bash %}
 
-$ pacstrap /mnt base base-devel grub-efi-x86_64
+$ pacstrap /mnt base base-devel
 
 {% endhighlight %}
 
