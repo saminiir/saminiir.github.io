@@ -1,21 +1,20 @@
 ---
 layout: post
 title:  "Configuring Arch Linux on Dell XPS 15"
-date:   2016-06-25 08:00:00
+date:   2016-06-26 08:00:00
 categories: linux
 permalink: configuring-arch-linux-on-dell-xps-15/
 ---
 
-* X11 for the windowing system
-* DWM for window management
+In the [previous post]({% post_url 2016-06-24-installing-arch-linux-on-dell-xps-15 %}), we've successfully booted into Arch Linux from our encrypted root partition.
+
+Let's now configure it to our (my) liking.
 
 # Contents
 {:.no_toc}
 
 * Will be replaced with the ToC, excluding the "Contents" header
 {:toc}
-
-Now we've successfully booted into Arch Linux from our encrypted root partition. Let's configure it to our liking.
 
 # User management
 
@@ -25,7 +24,9 @@ Now we've successfully booted into Arch Linux from our encrypted root partition.
 $ useradd -m -G wheel saminiir
 
 # Uncomment wheel group
-$ vi /etc/sudoers
+$ grep wheel /etc/sudoers
+%wheel ALL=(ALL) ALL
+# %wheel ALL=(ALL) NOPASSWD: ALL
 
 # Harden the root pasword if necessary
 $ passwd 
@@ -38,6 +39,7 @@ The Arch User Repository (AUR) contains community-driven packages. `yaourt` is a
 
 {% highlight bash %}
 
+$ pacman -S git
 $ git clone https://aur.archlinux.org/package-query.git
 $ cd package-query
 $ makepkg -si
@@ -63,7 +65,7 @@ $ lspci | grep -e VGA -e 3D
 $ pacman -S nvidia
 
 $ pacman -S xorg-server-utils xorg-xinit
-$ pacman -S git openssh slock terminus-font
+$ pacman -S openssh slock terminus-font
 
 $ git clone https://github.com/saminiir/dotfiles.git
 $ ln -s ~/dotfiles/xorg/xinitrc .xinitrc
@@ -77,7 +79,13 @@ Configure `dwm` to e.g. use `xterm` as terminal and change the modifier key to W
 
 $ git clone https://aur.archlinux.org/dwm-git.git
 $ cd dwm-git && makepkg
-$ vi src/dwm/config.h
+
+$ grep "define MODKEY" src/dwm/config.h
+#define MODKEY Mod4Mask
+
+$ grep "char \*termcmd" src/dwm/config.h
+static const char *termcmd[]  = { "xterm", NULL };
+
 $ makepkg -fi
 
 $ startx
@@ -165,16 +173,33 @@ These can be found from `xutils` in my dotfiles (described above).
 
 Just install `alsa-utils`, and use `alsamixer` to unmute the master channel. Should just work.
 
-# Storage: NVMe SSD
-
-*discard* is a property that SSDs generally benefit of.
-
-Systemd has an unit integrated that periodly (once a week or so) runs the linux-util `fstrim`. Enable it:
+For keyboard hotkeys, add the following to `xbindkeys` configuration:
 
 {% highlight bash %}
 
-$ systemctl status fstrim
-$ systemctl enable fstrim.timer
+$ grep -A1 amixer ~/.xbindkeysrc
+"/usr/bin/amixer set Master 5%+"
+    XF86AudioRaiseVolume
+--
+"/usr/bin/amixer set Master 5%-"
+    XF86AudioLowerVolume
+--
+"/usr/bin/amixer set Master toggle"
+    XF86AudioMute
+
+{% endhighlight %}
+
+# Storage: NVMe SSD
+
+Trimming is an operation SSDs benefit greatly of. However, enabling it for encrypted drives is a security risk[^ssd-trim-security]. The options are to enable trim and suffer the weakened security, or at regular intervals take maintainance on the drive.
+
+One way of minimizing writes, which can especially wear down SSD, is to use the `noatime` or `relatime` in the drives mount options. For me, this was enabled by default:
+
+{% highlight bash %}
+
+$ grep relatime /etc/fstab
+
+.. relatime ..
 
 {% endhighlight %}
 
@@ -197,7 +222,9 @@ $ cat /proc/acpi/bbswitch
 {% endhighlight %}
 
 
-# Power Management: powertop, backlight
+# Power Management
+
+## Powertop
 
 `powertop` is the best. Install it.
 
@@ -207,19 +234,71 @@ $ pacman -S powertop
 
 {% endhighlight %}
 
-Run calibration as many times as you like. Eventually, powertop will start to show accurate power consumption estimates.
+Run calibration as many times as you like. Eventually, powertop will start to show accurate power consumption estimates. Additionally, run it also with `--auto-tune`:
 
 {% highlight bash %}
 
 $ powertop --calibrate
+$ powertop --auto-tune
 
 {% endhighlight %}
+
+Also, add a systemd service for autotuning on startup:
+
+{% highlight bash %}
+
+$ cat /etc/systemd/system/powertop.service
+[Unit]
+Description=Powertop tunings
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/powertop --auto-tune
+
+[Install]
+WantedBy=multi-user.target
+
+$ systemctl enable powertop.service
+
+{% endhighlight %}
+
+## Battery status
+
+I use the command `acpi -b` for checking battery status. You need the package `acpi` for it.
+
+## Backlight
 
 The display's backlight is a huge power drain, and it is often convenient to have a hotkey to adjust it.
 
 {% highlight bash %}
 
 $ pacman -S light
+
+{% endhighlight %}
+
+Now, add commands to `xbindkeys` for manipulating the backlight:
+
+{% highlight bash %}
+
+$ grep -A3 light ~/.xbindkeysrc
+"/usr/bin/light -U 5"
+    m:0x0 + c:232
+    XF86MonBrightnessDown
+
+"/usr/bin/light -A 5"
+    m:0x0 + c:233
+    XF86MonBrightnessUp
+
+{% endhighlight %}
+
+## Laptop mode
+
+Also, activate _laptop-mode_[^laptop-mode]:
+
+{% highlight bash %}
+
+$ cat /etc/sysctl.d/laptop.conf
+vm.laptop_mode = 5
 
 {% endhighlight %}
 
@@ -253,6 +332,8 @@ $ mkinitcpio -p linux
 
 {% endhighlight %}
 
+## Debugging suspend/hibernation
+
 If suspend/hibernation does not work at first, debug it by setting `pm_test`
 
 {% highlight bash %}
@@ -262,14 +343,86 @@ none core processors platform devices freezer
 
 $ echo freezer | sudo /sys/power/pm_test
 $ systemctl suspend
+$ systemctl hybrid-sleep
 
 {% endhighlight %}
 
 Go through the different stages (`freezer`, `devices`..) and watch the output of `journalctl -r` for what goes wrong.
 
+## Locking screen on sleep
+
+I want to lock the screen (`slock`) whenever the system is put to sleep.
+
+This can be achieved by setting systemd units that have the `sleep.target` activated[^systemd-sleep-service]. See more examples from `dotfiles/systemd`:
+
+{% highlight bash %}
+
+$ cat /etc/systemd/system/suspend@saminiir.service
+[Unit]
+Description=User suspend actions
+Before=sleep.target
+
+[Service]
+User=%I
+Type=simple
+Environment=DISPLAY=:0
+ExecStart=/usr/bin/slock
+ExecStartPost=/usr/bin/sleep 1
+
+[Install]
+WantedBy=sleep.target
+
+$ systemctl enable suspend@saminiir.service
+
+{% endhighlight %}
+
+# Networking: netctl, Unbound
+
+Use whatever network manager that rows your boat. I have experience in NetworkManager, but the default `netctl` in Arch Linux might be worth using too.
+
+I've used `dnsmasq` in the past, but `unbound` seems like a cool caching DNS resolver that handles DNSSEC as well.
+
+{% highlight bash %}
+
+$ pacman -S expat unbound
+
+{% endhighlight %}
+
+See the documentation how to configure it. Most importantly your `/etc/resolv.conf` should point to `127.0.0.1` to use your own DNS program.
+
+{% highlight bash %}
+
+$ cat /etc/resolv.conf
+# Generated by resolvconf
+domain lan
+nameserver 127.0.0.1
+
+{% endhighlight %}
+
 # Browser: Firefox
 
 I use Firefox. With a high DPI screen, however, you should increase the pixel density. Go to `about:config` and set the `layout.css.devPixelsPerPx` to 2.
+
+# Backups: rsnapshot
+
+I use `rsnapshot`[^rsnapshot]. TODO.
+
+# Password Management: pass
+
+This is kind of an extra section, since password management is pretty personal. I, however, have liked the utility `pass`, which is a simplistic bash script for linux utilities like `pwgen`.
+
+{% highlight bash %}
+
+$ pacman -S pass
+
+# Or if you have an existing pass-store, e.g. in a private cloud, symlink the folder ~/.password-store to it
+$ pass init
+
+{% endhighlight %}
+
+`pass` uses your gpg-keys for encrypting/decrypting the files by default. See my earlier [blog post]({% post_url 2016-01-24-cryptographic-identity-gpg %}) on how to establish GPG.
+
+Then, synchronize the `~/.password-store` between computers however you like.
 
 # Gaming: Steam/Wine
 
@@ -295,30 +448,27 @@ $ WINEARCH=win32 WINEPREFIX=~/win32 winetricks -q msxml3 dotnet40 corefonts
 
 {% endhighlight %}
 
-Then, get the Steam installer from `steampowered.com`. Install it with wine:
+Then, use `winetricks to install Steam:
 
 {% highlight bash %}
 
-$ wine ~/Downloads/SteamInstaller.exe
+$ WINEARCH=win32 WINEPREFIX=~/win32 winetricks steam
 
 {% endhighlight %}
 
-# Password Management: pass
-
-This is kind of an extra section, since password management is pretty personal. I, however, have liked the utility `pass`, which is a simplistic bash script for linux utilities like `pwgen`.
+You should be able to start Steam/Wine. Your mileage may vary.
 
 {% highlight bash %}
 
-$ pacman -S pass
-
-# Or if you have an existing pass-store, e.g. in a private cloud, symlink the folder ~/.password-store to it
-$ pass init
+$ WINEARCH=win32 WINEPREFIX=~/wine32 primusrun wine ~/wine32/drive_c/Program\ Files/Steam/Steam.exe
 
 {% endhighlight %}
-
-`pass` uses your gpg-keys for encrypting/decrypting the files by default. See my blog post on how to establish GPG.
 
 {% include twitter.html %}
 
 # Sources 
 [^trim-on-lvm]:<https://blog.christophersmart.com/2016/05/12/trim-on-lvm-on-luks-on-ssd-revisited/>
+[^ssd-trim-security]:<https://wiki.archlinux.org/index.php/Dm-crypt/Specialties#Discard.2FTRIM_support_for_solid_state_drives_.28SSD.29>
+[^systemd-sleep-service]:<https://wiki.archlinux.org/index.php/Power_management#Suspend.2Fresume_service_files>
+[^laptop-mode]:<https://www.kernel.org/doc/Documentation/laptops/laptop-mode.txt>
+[^rsnapshot]:<http://rsnapshot.org/>
