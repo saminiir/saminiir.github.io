@@ -124,8 +124,20 @@ $ setxkbmap -option ctrl:nocaps
 # Kill X11 with ctrl+alt+backspace
 $ setxkbmap -option terminate:ctrl_alt_bksp
 
+# Change keyboard layout on right shift
+setxkbmap -layout us,fi -option grp:rshift_toggle
+
 $ grep meta~/.Xresources 
 xterm*metaSendsEscape: true
+
+{% endhighlight %}
+
+Furthermore, I like to have my tilde character lower on the keyboard, on the right side of left-shift:
+
+{% highlight bash %}
+
+$ grep tilde /usr/share/X11/xkb/symbols/pc
+    key <LSGT> {        [ grave, asciitilde, grave, asciitilde ] };
 
 {% endhighlight %}
 
@@ -290,6 +302,21 @@ Then, get the Steam installer from `steampowered.com`. Install it with wine:
 $ wine ~/Downloads/SteamInstaller.exe
 
 {% endhighlight %}
+
+# Password Management: pass
+
+This is kind of an extra section, since password management is pretty personal. I, however, have liked the utility `pass`, which is a simplistic bash script for linux utilities like `pwgen`.
+
+{% highlight bash %}
+
+$ pacman -S pass
+
+# Or if you have an existing pass-store, e.g. in a private cloud, symlink the folder ~/.password-store to it
+$ pass init
+
+{% endhighlight %}
+
+`pass` uses your gpg-keys for encrypting/decrypting the files by default. See my blog post on how to establish GPG.
 
 {% include twitter.html %}
 
