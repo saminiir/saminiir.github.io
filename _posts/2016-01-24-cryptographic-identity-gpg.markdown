@@ -345,6 +345,28 @@ After that, transfer the `encsubkey.sec.asc` via a secure mechanism, e.g. a flas
 
 Never transfer private keys through the internet, and strive for isolated environments where the transfer is done.
 
+## Synchronizing the keyring between computers
+
+Synchronizing a GPG keyring between computers may be desired to propagate information about imported key IDs[^gpg-synchronizing].
+
+On whichever computer, export the keyring and put it on the encrypted USB drive:
+
+{% highlight bash %}
+$ gpg --export-secret-keys > my-secret-keyring.gpg
+$ gpg --export-options export-local-sigs --export > my-public-keyring.gpg
+{% endhighlight %}
+
+Now, on the other computer, import (merge) the keyring:
+
+{% highlight bash %}
+ 
+$ gpg --import my-secret-keyring.gpg
+$ gpg --import-options import-local-sigs --import my-public-keyring.gpg
+
+{% endhighlight %}
+
+Repeat this process the other way around, if needed.
+
 {% include twitter.html %}
 
 # Notes
@@ -362,3 +384,4 @@ Never transfer private keys through the internet, and strive for isolated enviro
 [^11]:<https://futureboy.us/pgp.html#PerfectKeypair>
 [^12]:<http://davidsoergel.com/posts/thoughts-on-gpg-key-management>
 [^13]:<https://wiki.debian.org/Subkeys>
+[^gpg-synchronizing]:<https://lists.gnupg.org/pipermail/gnupg-users/2011-May/041763.html>
