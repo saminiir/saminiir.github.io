@@ -218,7 +218,7 @@ The `initrd /intel-ucode.img` is the microcode for Intel processors - if you hav
 
 Now you can exit the chroot (`exit`) and reboot. If all went well, you should be asked to unlock the root partition's encryption and be awarded with a login shell.
 
-In the next post, I'll describe the steps to configure a straightforward userspace setup for Arch Linux.
+In the [next post]({% post_url 2016-06-26-configuring-arch-linux-on-dell-xps-15 %}), I'll describe the steps to configure a straightforward userspace setup for Arch Linux.
 
 {% include twitter.html %}
 
