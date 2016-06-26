@@ -359,10 +359,8 @@ $ gpg --export-options export-local-sigs --export > my-public-keyring.gpg
 Now, on the other computer, import (merge) the keyring:
 
 {% highlight bash %}
- 
 $ gpg --import my-secret-keyring.gpg
 $ gpg --import-options import-local-sigs --import my-public-keyring.gpg
-
 {% endhighlight %}
 
 Repeat this process the other way around, if needed.
