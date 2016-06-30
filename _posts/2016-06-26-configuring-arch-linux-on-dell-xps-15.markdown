@@ -96,7 +96,7 @@ $ startx
 
 # Terminal: xterm
 
-For some reason, I've stuck on using `xterm`. Even its manual page says that it needs to be rewritten, so feel free to go find an alternative.
+For some reason, I'm stuck on using `xterm`. Even its manual page says that it needs to be rewritten, so feel free to go find an alternative.
 
 For the rest of us, at least the following tweaks are useful:
 
@@ -133,7 +133,7 @@ $ setxkbmap -option ctrl:nocaps
 $ setxkbmap -option terminate:ctrl_alt_bksp
 
 # Change keyboard layout on right shift
-setxkbmap -layout us,fi -option grp:rshift_toggle
+$ setxkbmap -layout us,fi -option grp:rshift_toggle
 
 $ grep meta~/.Xresources 
 xterm*metaSendsEscape: true
@@ -191,7 +191,7 @@ $ grep -A1 amixer ~/.xbindkeysrc
 
 # Storage: NVMe SSD
 
-Trimming is an operation SSDs benefit greatly of. However, enabling it for encrypted drives is a security risk[^ssd-trim-security]. The options are to enable trim and suffer the weakened security, or at regular intervals take maintainance on the drive.
+Trimming is an operation SSDs benefit greatly of. However, enabling it for encrypted drives is a security risk[^ssd-trim-security]. The options are to enable trim and suffer the weakened security, or at regular intervals take maintenance on the drive.
 
 One way of minimizing writes, which can especially wear down SSD, is to use the `noatime` or `relatime` in the drives mount options. For me, this was enabled by default:
 
@@ -205,7 +205,7 @@ $ grep relatime /etc/fstab
 
 # Graphics: Nvidia and Bumblebee
 
-Let's install bumblebee for smart workswitching for the integrated and dedicated graphics:
+Let's install bumblebee for smart switching of the integrated and dedicated graphics:
 
 {% highlight bash %}
 
