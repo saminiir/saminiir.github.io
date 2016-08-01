@@ -304,11 +304,11 @@ vm.laptop_mode = 5
 
 # Suspend/hibernate
 
-Add `resume` to Kernel parameters. 
+Add `resume` to the kernel parameters:
 
 {% highlight bash %}
 
-$ vi /boot/lodar/entries/arch-encrypted-lvm.conf
+$ vi /boot/loader/entries/arch-encrypted-lvm.conf
 options ... resume=/dev/mapper/MyVol-swap quiet rw
 
 {% endhighlight %}
