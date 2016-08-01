@@ -464,6 +464,28 @@ $ WINEARCH=win32 WINEPREFIX=~/wine32 primusrun wine ~/wine32/drive_c/Program\ Fi
 
 {% endhighlight %}
 
+## Gamepad
+
+My generic xbox pad just worked out-of-the-box. See the kernel docs for more info[^xpad].
+
+{% highlight bash %}
+
+$ dmesg | tail -n3
+[ 3508.420268] usb 1-1: new full-speed USB device number 5 using xhci_hcd
+[ 3508.609392] input: Generic X-Box pad as /devices/pci0000:00/0000:00:14.0/usb1/1-1/1-1:1.0/input/input21
+[ 3508.609619] usbcore: registered new interface driver xpad
+
+{% endhighlight %}
+
+You can test the pad:
+
+{% highlight bash %}
+
+$ pacman -S joyutils
+$ jstest /dev/input/js0
+
+{% endhighlight %}
+
 {% include twitter.html %}
 
 # Sources 
@@ -472,3 +494,4 @@ $ WINEARCH=win32 WINEPREFIX=~/wine32 primusrun wine ~/wine32/drive_c/Program\ Fi
 [^systemd-sleep-service]:<https://wiki.archlinux.org/index.php/Power_management#Suspend.2Fresume_service_files>
 [^laptop-mode]:<https://www.kernel.org/doc/Documentation/laptops/laptop-mode.txt>
 [^rsnapshot]:<http://rsnapshot.org/>
+[^xpad]:<https://www.kernel.org/doc/Documentation/input/xpad.txt>
