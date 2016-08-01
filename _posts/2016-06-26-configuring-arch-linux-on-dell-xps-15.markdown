@@ -149,6 +149,24 @@ $ grep tilde /usr/share/X11/xkb/symbols/pc
 
 {% endhighlight %}
 
+Additionally, increase the Linux console font size:
+
+{% highlight bash %}
+$ cat /etc/vconsole.conf
+FONT=ter-i32n
+{% endhighlight %}
+
+And apply it to early userspace too:
+
+{% highlight bash %}
+
+$ grep consolefont /etc/mkinitcpio.conf
+HOOKS="base udev autodetect modconf block encrypt lvm2 resume filesystems keyboard fsck consolefont"
+
+$ mkinitcpio -p linux
+
+{% endhighlight %}
+
 # Input: Trackpad gestures (libinput)
 
 I chose to use `libinput` over synaptics for the touchpad driver.
