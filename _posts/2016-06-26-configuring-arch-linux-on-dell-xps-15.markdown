@@ -486,6 +486,39 @@ $ jstest /dev/input/js0
 
 {% endhighlight %}
 
+# iPhone
+
+I like the robustness of iPhones. I tried a Sony Z5 Compact, but the first drop broke the glass. My iPhone 5 of three years has taken a substantial amount of beating and does not have a dent. Go figure.
+
+Install `libimobiledevice` to access the iPhone in Linux:
+
+{% highlight bash %}
+
+$ pacman -S libimobiledevice usbmuxd
+$ systemctl start usbmuxd
+
+{% endhighlight %}
+
+Then, connect your iPhone via USB. Have the screen unlocked. It should be detected:
+
+{% highlight bash %}
+
+Jun 28 18:43:24 localhost kernel: ipheth 1-2:4.2: Apple iPhone USB Ethernet device attached
+Jun 28 18:43:24 localhost kernel: usbcore: registered new interface driver ipheth
+Jun 28 18:43:24 localhost kernel: ipheth 1-2:4.2 enp0s20f0u2c4i2: renamed from eth0
+
+$ idevicepair pair
+
+{% endhighlight %}
+
+Then, you can backup your iPhone:
+
+{% highlight bash %}
+
+$ idevicebackup2 backup ~/Documents/iphone-backups/
+
+{% endhighlight %}
+
 {% include twitter.html %}
 
 # Sources 
