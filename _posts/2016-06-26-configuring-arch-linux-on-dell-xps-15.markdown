@@ -399,6 +399,75 @@ nameserver 127.0.0.1
 
 {% endhighlight %}
 
+# Security
+
+These are the basic steps I took to harden my Arch Linux.
+
+To lockout a user for ten minutes after three failed login attempts:
+
+{% highlight bash %}
+$ grep pam_tally /etc/pam.d/system-login
+#auth       required   pam_tally.so         onerr=succeed file=/var/log/faillog
+auth       required   pam_tally.so deny=2 unlock_time=600 onerr=succeed file=/var/log/faillog
+{% endhighlight %}
+
+Do not allow SSH login as root:
+
+{% highlight bash %}
+
+$ grep PermitRootLogin /etc/ssh/sshd_config
+PermitRootLogin no
+
+{% endhighlight %}
+
+Restrict access to dmesg:
+
+{% highlight bash %}
+
+$ cat /etc/sysctl.d/50-dmesg-restrict.conf
+
+kernel.dmesg_restrict = 1
+
+{% endhighlight %}
+
+Configure firewall to drop pretty much all incoming connections, but allow outgoing and already established ones:
+
+{% highlight bash %}
+
+$ cat /etc/iptables/iptables.rules
+*filter
+:INPUT DROP [0:0]
+:FORWARD DROP [0:0]
+:OUTPUT ACCEPT [0:0]
+-A INPUT -p icmp -j ACCEPT
+-A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+-A INPUT -i lo -j ACCEPT
+-A INPUT -p tcp -j REJECT --reject-with tcp-reset
+-A INPUT -p udp -j REJECT --reject-with icmp-port-unreachable
+-A INPUT -j REJECT --reject-with icmp-proto-unreachable
+COMMIT
+{% endhighlight %}
+
+Do the same for IPv6 (ip6tables). You have to adjust some of the rules to IPv6.
+
+Harden the Linux TCP/IP stack:
+
+{% highlight bash %}
+$ cat /etc/sysctl.d/51-tcp-ip-stack.conf
+
+net.ipv4.tcp_rfc1337 = 1
+net.ipv4.conf.all.log_martians = 1
+net.ipv4.conf.all.send_redirects = 0
+
+## ICMP routing redirects (only secure)
+##net.ipv4.conf.all.secure_redirects = 1 (default)
+net.ipv4.conf.default.accept_redirects=0
+net.ipv4.conf.all.accept_redirects=0
+net.ipv6.conf.default.accept_redirects=0
+net.ipv6.conf.all.accept_redirects=0
+
+{% endhighlight %}
+
 # Browser: Firefox
 
 I use Firefox. With a high DPI screen, however, you should increase the pixel density. Go to `about:config` and set the `layout.css.devPixelsPerPx` to 2.
