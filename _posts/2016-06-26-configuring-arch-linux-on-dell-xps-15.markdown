@@ -444,7 +444,7 @@ Setup a 32-bit wine environment:
 $ WINEARCH=win32 WINEPREFIX=~/win32 winecfg
 
 # Install .NET Framework 4.0, just for laughs
-$ WINEARCH=win32 WINEPREFIX=~/win32 winetricks -q msxml3 dotnet40 corefonts
+$ WINEARCH=win32 WINEPREFIX=~/win32 winetricks -q dotnet45 corefonts
 
 {% endhighlight %}
 
@@ -456,7 +456,7 @@ $ WINEARCH=win32 WINEPREFIX=~/win32 winetricks steam
 
 {% endhighlight %}
 
-You should be able to start Steam/Wine. Your mileage may vary.
+You should be able to start Steam/Wine. Your mileage may vary. It is easy to have missed lib32 packages on a 64-bit system, so you might have to chase down dependencies.
 
 {% highlight bash %}
 
