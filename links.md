@@ -21,3 +21,4 @@ This page contains links to articles, papers and blog posts I've found insightfu
 - [Embracing Conway's Law](https://wingolog.org/archives/2015/11/09/embracing-conways-law)
 - [20 Years - One Standard: The Story of TCP/IP](http://www.cbi.umn.edu/iterations/spira.html)
 - [The C10K problem](http://www.kegel.com/c10k.html)
+- [The ecosystem is moving](https://whispersystems.org/blog/the-ecosystem-is-moving/)
