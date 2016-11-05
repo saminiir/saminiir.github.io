@@ -1,9 +1,9 @@
 ---
 layout: post
-title:  "Let's code a TCP/IP stack, 4: TCP Data Flow"
-date:   2016-06-01 09:00:00
+title:  "Let's code a TCP/IP stack, 4: TCP Data Flow & Socket API"
+date:   2016-10-08 09:00:00
 categories: [tcp/ip, tutorial, c programming, ip, networking, linux]
-permalink: lets-code-tcp-ip-stack-4-tcp-data-flow/
+permalink: lets-code-tcp-ip-stack-4-tcp-data-flow-socket-api/
 description: ""
 ---
 
