@@ -126,6 +126,31 @@ IP 10.0.0.5.8000 > 10.0.0.4.12000: Flags [F.], seq 374, ack 18, win 29200, lengt
 IP 10.0.0.4.12000 > 10.0.0.5.8000: Flags [.], ack 375, win 29200, length 0
 {% endhighlight %}
 
+# TCP Connection Termination
+
+Closing a TCP connection is likewise an involved operation, and can be forcibly terminated (RST) or finished with a mutual agreement (FIN).
+
+The basic scenario is as follows:
+
+1. The _active closer_ sends a FIN segment.
+2. The _passive closer_ acknowledges this by sending an ACK segment.
+3. The _passive closer_ starts its own close operation (when it has no more data to send) and effectively becomes an _active closer_.
+4. Once both sides have sent a FIN to each other and they have acknowledged them to both directions, the connection closes.
+
+Evidently, the closing of a TCP connection requires four segments, in contrast to the three segments of the TCP connection establishment (three-way handshake).
+
+Additionally, TCP is a bi-directional protocol, so it is possible to have the other end announce it has no more data to send, but stay online for incoming data. This is called _TCP Half-close_.
+
+The unreliable nature of packet-switched networks add additional complexity to the connection termination. For example, FIN segments can disappear or never intentionally be sent, which leaves the connection in an awkward state. For example, in Linux the kernel parameter `tcp_fin_timeout` controls how many seconds TCP waits for a final FIN packet, before forcibly closing the connection. This is a violation of the specification, but is needed for DDoS prevention.[^man-tcp]
+
+Aborting a connection involves a segment with the RST flag set. Resets can occur because of many reasons, but some usual ones are:
+
+1. Connection request to a nonexistent port or interface
+2. The other TCP has crashed and ends up in a out-of-sync connection state
+3. Malicious attempts to disturb existing connections[^tcp-rst-attack]
+
+The happy path of TCP data transmission never involves a RST segment.
+
 # TCP Socket API
 
 To be able to utilize the networking stack, some kind of an interface has to be provided for applications. The _BSD Socket API_ is the most famous one and it originates from the 4.2BSD UNIX release from 1983.[^tcp-illustrated-implementation]
