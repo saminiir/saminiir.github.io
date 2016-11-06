@@ -87,7 +87,7 @@ For example, when A decides to send a segment with data to B, the following happ
 
 The amount by which the variables are advanced is the length of the data in the segment.
 
-This is the basis for TCP control logic over the transmit of data. Let's look at this more closely with `tcpdump`, a Linux utility to capture traffic on the wire:
+This is the basis for TCP control logic over the transmit of data. Let's see how this looks like with `tcpdump(1)`, a common utility to capture traffic on the wire:
 
 {% highlight bash %}
 [saminiir@localhost level-ip]$ sudo tcpdump -i any port 8000 -nt
@@ -96,16 +96,18 @@ IP 10.0.0.5.8000 > 10.0.0.4.12000: Flags [S.], seq 825056904, ack 1525253, win 2
 IP 10.0.0.4.12000 > 10.0.0.5.8000: Flags [.], ack 1, win 29200, length 0
 {% endhighlight %}
 
-The address 10.0.0.4 initiates a connection from port 12000 to host 10.0.0.5 listening on port 8000.
+The address 10.0.0.4 (host A) initiates a connection from port 12000 to host 10.0.0.5 (host B) listening on port 8000.
 
-After the three-way handshake, connection is established. Initial sequence numbers are 1525252 for 10.0.0.4:12000, and 825056904 for 10.0.0.5:8000.
+After the three-way handshake, connection is established and their internal TCP socket state is set to `ESTABLISHED`. Initial sequence numbers are 1525252 for A, and 825056904 for B.
 
 {% highlight bash %}
 IP 10.0.0.4.12000 > 10.0.0.5.8000: Flags [P.], seq 1:18, ack 1, win 29200, length 17
 IP 10.0.0.5.8000 > 10.0.0.4.12000: Flags [.], ack 18, win 29200, length 0
 {% endhighlight %}
        					
-The host 10.0.0.4:12000 sends a segment with 17 bytes of data, which 10.0.0.5:8000 acknowledges with an ACK segment. Relative sequence numbers are shown by default with tcpdump, so that's why `ack 18` is displayed. Internally, the TCP of the receiving host has advanced `RCV.NXT` with the number 17.
+Host A sends a segment with 17 bytes of data, which host B acknowledges with an ACK segment. Relative sequence numbers are shown by default with `tcpdump` to ease readability. Thus, `ack 18` is actually 1525253 + 17. 
+
+Internally, the TCP of the receiving host (B) has advanced `RCV.NXT` with the number 17.
 
 {% highlight bash %}
 IP 10.0.0.4.12000 > 10.0.0.5.8000: Flags [.], ack 1, win 29200, length 0
@@ -117,14 +119,16 @@ IP 10.0.0.5.8000 > 10.0.0.4.12000: Flags [P.], seq 156:374, ack 18, win 29200, l
 IP 10.0.0.4.12000 > 10.0.0.5.8000: Flags [.], ack 374, win 29200, length 0
 {% endhighlight %}
 
+The interplay of sending data and acknowledging it continues. As can be seen, the segments with `length 0` only have the ACK flag set, but the acknowledgement sequence numbers are precisely increment based on the previously received segment's length. 
+
 {% highlight bash %}
-
 IP 10.0.0.5.8000 > 10.0.0.4.12000: Flags [F.], seq 374, ack 18, win 29200, length 0
-
-// 10.0.0.5:8000 informs that it has no more data to send (FIN flag)
-
 IP 10.0.0.4.12000 > 10.0.0.5.8000: Flags [.], ack 375, win 29200, length 0
 {% endhighlight %}
+
+Host B informs host A that it has no more data to send by sending a segment with the FIN flag set. In turn, host A acknowledges this.
+
+To finish the connection, host A also has to signal that it has no more data to send.
 
 # TCP Connection Termination
 
@@ -159,9 +163,9 @@ The basic API in Linux is pretty straight-forward. You reserve a socket by calli
 
 After succesfully reserving a TCP socket from the networking stack, you will connect it to a remote endpoint. This is where `connect(2)` is used and calling it will launch the TCP handshake.
 
-From that point on, we can just `write(2)` and `read(2)` data from our socket. It is up to the application to determine what to do with the data.
+From that point on, we can just `write(2)` and `read(2)` data from our socket.
 
-The networking stack will handle queueing, retransmission, error-checking and reassembly of the data in the TCP stream. For the application, the inner acting of TCP is opaque. The only thing the application can be sure is that the TCP has acknowledged the responsibility of sending and receiving the stream of data.
+The networking stack will handle queueing, retransmission, error-checking and reassembly of the data in the TCP stream. For the application, the inner acting of TCP is mostly opaque. The only thing the application can be sure is that the TCP has acknowledged the responsibility of sending and receiving the stream of data and subsequent informational messages from the socket interface.
 
 # Testing our Socket API
 
@@ -197,3 +201,6 @@ The source code for the project is hosted at [GitHub](https://github.com/saminii
 [^tcp-seq-num-attack]:<http://www.ietf.org/rfc/rfc1948.txt>
 [^osi-model]:<https://en.wikipedia.org/wiki/OSI_model>
 [^first-tcp-spec]:<https://tools.ietf.org/html/rfc675>
+[^tcp-illustrated-implementation]:<http://www.kohala.com/start/tcpipiv2.html>
+[^man-tcp]:<https://linux.die.net/man/7/tcp>
+[^tcp-rst-attack]:<https://en.wikipedia.org/wiki/TCP_reset_attack>
