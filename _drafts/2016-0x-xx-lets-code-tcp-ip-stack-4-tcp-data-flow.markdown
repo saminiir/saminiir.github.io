@@ -9,9 +9,9 @@ description: ""
 
 Previously, we introduced ourselves to the TCP header and how a connection is established between two parties.
 
-In this post, we will look into the flow of TCP data communication and how it is managed.
+In this post, we will look into TCP data communication and how it is managed.
 
-Additionally, we will provide an interface from the networking stack that applications can use for network communication. This _Socket API_ is then utilized in our application that sends a HTTP GET request to the given network host and reads the response.
+Additionally, we will provide an interface from the networking stack that applications can use for network communication. This _Socket API_ is then utilized in our example application to send a HTTP GET request to a network host and to read the response.
 
 # Contents
 {:.no_toc}
@@ -25,7 +25,7 @@ Additionally, we will provide an interface from the networking stack that applic
 
 It is beneficial to start the discussion on TCP data management by defining the variables that record the data flow state.
 
-In short, the TCP has to keep track of the sequences it has sent and received acknowledgments for. To achieve this, a data structure called the _Transmission Control Block_ (TCB) is generated for every opened connection.
+In short, the TCP has to keep track of the sequences of data it has sent and received acknowledgments for. To achieve this, a data structure called the _Transmission Control Block_ (TCB) is initialized for every opened connection.
 
 The variables for the outgoing (sending) data are:
 
@@ -69,13 +69,13 @@ Together, these variables constitute most of the TCP control logic for a given c
 
 # TCP Data Communication
 
-Once a connection is established, explicit handling of the data flow is taken into use. Three variables from the TCB are the most important for basic tracking of the state: 
+Once a connection is established, explicit handling of the data flow starts. Three variables from the TCB are important for basic tracking of the state: 
 
 * `SND.NXT` - The sender will track the next sequence number to use in `SND.NXT`. 
 * `RCV.NXT` - The receiver records the next sequence number to expect in `RCV.NXT`.
 * `SND.UNA` - The sender will record the *oldest* unacknowledged sequence number in `SND.UNA`. 
 
-Given a sufficient time period, when no data transmit occurs, all these three variables will be equal.
+Given a sufficient time period when TCP is managing the data communication and no transmit occurs, all these three variables will be equal.
 
 For example, when A decides to send a segment with data to B, the following happens:
 
@@ -145,7 +145,7 @@ Evidently, the closing of a TCP connection requires four segments, in contrast t
 
 Additionally, TCP is a bi-directional protocol, so it is possible to have the other end announce it has no more data to send, but stay online for incoming data. This is called _TCP Half-close_.
 
-The unreliable nature of packet-switched networks add additional complexity to the connection termination. For example, FIN segments can disappear or never intentionally be sent, which leaves the connection in an awkward state. For example, in Linux the kernel parameter `tcp_fin_timeout` controls how many seconds TCP waits for a final FIN packet, before forcibly closing the connection. This is a violation of the specification, but is needed for DDoS prevention.[^man-tcp]
+The unreliable nature of packet-switched networks add additional complexity to the connection termination. For example, FIN segments can disappear or never intentionally be sent, which leaves the connection in an awkward state. For example, in Linux the kernel parameter `tcp_fin_timeout` controls how many seconds TCP waits for a final FIN packet, before forcibly closing the connection. This is a violation of the specification, but is needed for Denial of Service (DoS) prevention.[^man-tcp]
 
 Aborting a connection involves a segment with the RST flag set. Resets can occur because of many reasons, but some usual ones are:
 
@@ -153,19 +153,48 @@ Aborting a connection involves a segment with the RST flag set. Resets can occur
 2. The other TCP has crashed and ends up in a out-of-sync connection state
 3. Malicious attempts to disturb existing connections[^tcp-rst-attack]
 
-The happy path of TCP data transmission never involves a RST segment.
+Thus the happy path of TCP data transmission never involves a RST segment.
 
 # TCP Socket API
 
-To be able to utilize the networking stack, some kind of an interface has to be provided for applications. The _BSD Socket API_ is the most famous one and it originates from the 4.2BSD UNIX release from 1983.[^tcp-illustrated-implementation]
+To be able to utilize the networking stack, some kind of an interface has to be provided for applications. The _BSD Socket API_ is the most famous one and it originates from the 4.2BSD UNIX release from 1983.[^tcp-illustrated-implementation] The socket API in Linux is compatible to the BSD Socket API.[^socket-man] 
 
-The basic API in Linux is pretty straight-forward. You reserve a socket by calling `socket(2)`, passing the type of the socket and protocol as parameters. Common values are `AF_INET` for the type and `SOCK_STREAM` as domain. This will default to a TCP-over-IPv4 socket. 
+A socket is reserved from the networking stack by calling `socket(2)`, passing the type of the socket and protocol as parameters. Common values are `AF_INET` for the type and `SOCK_STREAM` as domain. This will default to a TCP-over-IPv4 socket. 
 
-After succesfully reserving a TCP socket from the networking stack, you will connect it to a remote endpoint. This is where `connect(2)` is used and calling it will launch the TCP handshake.
+After succesfully reserving a TCP socket from the networking stack, it will be connected to a remote endpoint. This is where `connect(2)` is used and calling it will launch the TCP handshake.
 
 From that point on, we can just `write(2)` and `read(2)` data from our socket.
 
-The networking stack will handle queueing, retransmission, error-checking and reassembly of the data in the TCP stream. For the application, the inner acting of TCP is mostly opaque. The only thing the application can be sure is that the TCP has acknowledged the responsibility of sending and receiving the stream of data and subsequent informational messages from the socket interface.
+The networking stack will handle queueing, retransmission, error-checking and reassembly of the data in the TCP stream. For the application, the inner acting of TCP is mostly opaque. The only thing the application can rely on is that the TCP has acknowledged the responsibility of sending and receiving the stream of data, and that it will inform the application of unexpected behavior through the socket API.
+
+As an example, let's look at the system calls that a simple invocation of `curl(1)` does:
+
+{% highlight bash %}
+$ strace -esocket,connect,sendto,recvfrom,close curl -s example.com > /dev/null
+...
+socket(AF_INET, SOCK_STREAM, IPPROTO_TCP) = 3
+connect(3, {sa_family=AF_INET, sin_port=htons(80), sin_addr=inet_addr("93.184.216.34")}, 16) = -1 EINPROGRESS (Operation now in progress)
+sendto(3, "GET / HTTP/1.1\r\nHost: example.co"..., 75, MSG_NOSIGNAL, NULL, 0) = 75
+recvfrom(3, "HTTP/1.1 200 OK\r\nCache-Control: "..., 16384, 0, NULL, NULL) = 1448
+close(3)                                = 0
++++ exited with 0 +++
+{% endhighlight %}
+
+We observe the Socket API calls with `strace(1)`, a tool for tracing system calls and signals. The steps are:
+
+1. A socket is opened with `socket`, and the type is specified as IPv4/TCP.
+
+2. `connect` launches the TCP handshake. Destination address and port are passed to the function.
+
+3. After the connection is successfully established, `sendto(3)` is used to write data to the socket - in this case, the usual HTTP GET request. 
+
+4. From that point on, `curl` eventually reads the incoming data with `recvfrom`.
+
+The astute reader may have noticed that no `read` or `write` system calls were placed. This is because the actual socket API does not contain those functions, but normal I/O operations can also be used. From `man socket(7)`:[^socket-man]
+
+_In addition, the standard I/O operations like write(2), writev(2), sendfile(2), read(2), and readv(2) can be used to read and write data._
+
+In the end, the Socket API contains multiple functions for just writing and reading data. This is complicated by the I/O family of functions, which can also be used to manipulate the socket's file descriptor.
 
 # Testing our Socket API
 
@@ -185,7 +214,7 @@ In the end, sending a HTTP GET request exercises the underlying networking stack
 
 We have now essentially implemented a rudimentary TCP with simple data management and provided an interface applications can use.
 
-However, TCP data communication is not a simple problem. The packets can get corrupted, reordered or lost in transit. Furthermore, the data transmit can congest various elements in the network.
+However, TCP data communication is not a simple problem. The packets can get corrupted, reordered or lost in transit. Furthermore, the data transmit can congest arbitrary elements in the network.
 
 For this, the TCP data communication needs to include more sophisticated logic. In the next post we will look into TCP Window Management and TCP Retransmission Timeout mechanisms, to better cope with more challenging settings.
 
@@ -204,3 +233,4 @@ The source code for the project is hosted at [GitHub](https://github.com/saminii
 [^tcp-illustrated-implementation]:<http://www.kohala.com/start/tcpipiv2.html>
 [^man-tcp]:<https://linux.die.net/man/7/tcp>
 [^tcp-rst-attack]:<https://en.wikipedia.org/wiki/TCP_reset_attack>
+[^socket-man]:<http://man7.org/linux/man-pages/man7/socket.7.html>
