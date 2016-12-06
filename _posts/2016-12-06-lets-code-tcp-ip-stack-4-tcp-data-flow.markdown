@@ -155,7 +155,7 @@ Aborting a connection involves a segment with the RST flag set. Resets can occur
 
 Thus, the happy path of TCP data transmission never involves a RST segment.
 
-# TCP Socket API
+# Socket API
 
 To be able to utilize the networking stack, some kind of an interface has to be provided for applications. The _BSD Socket API_ is the most famous one and it originates from the 4.2BSD UNIX release from 1983.[^tcp-illustrated-implementation] The Socket API in Linux is compatible to the BSD Socket API.[^socket-man] 
 
