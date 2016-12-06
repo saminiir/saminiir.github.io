@@ -4,7 +4,7 @@ title:  "Let's code a TCP/IP stack, 4: TCP Data Flow & Socket API"
 date:   2016-12-06 12:00:00
 categories: [tcp/ip, tutorial, c programming, ip, networking, linux]
 permalink: lets-code-tcp-ip-stack-4-tcp-data-flow-socket-api/
-description: "Previously, we introduced ourselves to the TCP header and how a connection is established between two parties. In this post, we will look into TCP data communication and how it is managed. Additionally, we will provide an interface from the networking stack that applications can use for network communication. This Socket API is then utilized by our example application to send a simple HTTP request to a website."
+description: "In this post, we will look into TCP data communication and how it is managed. Additionally, we will provide an interface from the networking stack that applications can use for network communication. This Socket API is then utilized by our example application to send a simple HTTP request to a website."
 ---
 
 Previously, we introduced ourselves to the TCP header and how a connection is established between two parties.
