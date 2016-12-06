@@ -1,17 +1,17 @@
 ---
 layout: post
 title:  "Let's code a TCP/IP stack, 4: TCP Data Flow & Socket API"
-date:   2016-10-08 09:00:00
+date:   2016-12-06 12:00:00
 categories: [tcp/ip, tutorial, c programming, ip, networking, linux]
 permalink: lets-code-tcp-ip-stack-4-tcp-data-flow-socket-api/
-description: ""
+description: "Previously, we introduced ourselves to the TCP header and how a connection is established between two parties. In this post, we will look into TCP data communication and how it is managed. Additionally, we will provide an interface from the networking stack that applications can use for network communication. This Socket API is then utilized by our example application to send a simple HTTP request to a website."
 ---
 
 Previously, we introduced ourselves to the TCP header and how a connection is established between two parties.
 
 In this post, we will look into TCP data communication and how it is managed.
 
-Additionally, we will provide an interface from the networking stack that applications can use for network communication. This _Socket API_ is then utilized in our example application to send a HTTP GET request to a network host and to read the response.
+Additionally, we will provide an interface from the networking stack that applications can use for network communication. This _Socket API_ is then utilized by our example application to send a simple HTTP request to a website.
 
 # Contents
 {:.no_toc}
@@ -27,7 +27,7 @@ It is beneficial to start the discussion on TCP data management by defining the 
 
 In short, the TCP has to keep track of the sequences of data it has sent and received acknowledgments for. To achieve this, a data structure called the _Transmission Control Block_ (TCB) is initialized for every opened connection.
 
-The variables for the outgoing (sending) data are:
+The variables for the outgoing (sending) side are:
 
 {% highlight bash %}
     Send Sequence Variables
@@ -38,7 +38,7 @@ The variables for the outgoing (sending) data are:
       SND.UP  - send urgent pointer
       SND.WL1 - segment sequence number used for last window update
       SND.WL2 - segment acknowledgment number used for last window update
-	  ISS     - initial send sequence number
+      ISS     - initial send sequence number
 {% endhighlight %}
 
 In turn, the following data is recorded for the receiving side:
@@ -52,7 +52,7 @@ In turn, the following data is recorded for the receiving side:
       IRS     - initial receive sequence number
 {% endhighlight %}
 
-Additionally, helper variables of the current segment being processed are defined:
+Additionally, helper variables of the current segment being processed are defined followingly:
 
 {% highlight bash %}
     Current Segment Variables
@@ -87,7 +87,7 @@ For example, when A decides to send a segment with data to B, the following happ
 
 The amount by which the variables are advanced is the length of the data in the segment.
 
-This is the basis for TCP control logic over the transmit of data. Let's see how this looks like with `tcpdump(1)`, a common utility to capture traffic on the wire:
+This is the basis for TCP control logic over the transmit of data. Let's see how this looks like with `tcpdump(1)`, a popular utility for capturing network traffic:
 
 {% highlight bash %}
 [saminiir@localhost level-ip]$ sudo tcpdump -i any port 8000 -nt
@@ -98,7 +98,7 @@ IP 10.0.0.4.12000 > 10.0.0.5.8000: Flags [.], ack 1, win 29200, length 0
 
 The address 10.0.0.4 (host A) initiates a connection from port 12000 to host 10.0.0.5 (host B) listening on port 8000.
 
-After the three-way handshake, connection is established and their internal TCP socket state is set to `ESTABLISHED`. Initial sequence numbers are 1525252 for A, and 825056904 for B.
+After the three-way handshake, the connection is established and their internal TCP socket state is set to `ESTABLISHED`. Initial sequence numbers are 1525252 for A, and 825056904 for B.
 
 {% highlight bash %}
 IP 10.0.0.4.12000 > 10.0.0.5.8000: Flags [P.], seq 1:18, ack 1, win 29200, length 17
@@ -126,7 +126,7 @@ IP 10.0.0.5.8000 > 10.0.0.4.12000: Flags [F.], seq 374, ack 18, win 29200, lengt
 IP 10.0.0.4.12000 > 10.0.0.5.8000: Flags [.], ack 375, win 29200, length 0
 {% endhighlight %}
 
-Host B informs host A that it has no more data to send by sending a segment with the FIN flag set. In turn, host A acknowledges this.
+Host B informs host A that it has no more data to send by generating a FIN segment. In turn, host A acknowledges this.
 
 To finish the connection, host A also has to signal that it has no more data to send.
 
@@ -145,19 +145,19 @@ Evidently, the closing of a TCP connection requires four segments, in contrast t
 
 Additionally, TCP is a bi-directional protocol, so it is possible to have the other end announce it has no more data to send, but stay online for incoming data. This is called _TCP Half-close_.
 
-The unreliable nature of packet-switched networks add additional complexity to the connection termination. For example, FIN segments can disappear or never intentionally be sent, which leaves the connection in an awkward state. For example, in Linux the kernel parameter `tcp_fin_timeout` controls how many seconds TCP waits for a final FIN packet, before forcibly closing the connection. This is a violation of the specification, but is needed for Denial of Service (DoS) prevention.[^man-tcp]
+The unreliable nature of packet-switched networks introduce additional complexity to the connection termination - FIN segments can disappear or never intentionally be sent, which leaves the connection in an awkward state. For example, in Linux the kernel parameter `tcp_fin_timeout` controls how many seconds TCP waits for a final FIN packet, before forcibly closing the connection. This is a violation of the specification, but is needed for Denial of Service (DoS) prevention.[^man-tcp]
 
 Aborting a connection involves a segment with the RST flag set. Resets can occur because of many reasons, but some usual ones are:
 
 1. Connection request to a nonexistent port or interface
 2. The other TCP has crashed and ends up in a out-of-sync connection state
-3. Malicious attempts to disturb existing connections[^tcp-rst-attack]
+3. Attempts to disturb existing connections[^tcp-rst-attack]
 
-Thus the happy path of TCP data transmission never involves a RST segment.
+Thus, the happy path of TCP data transmission never involves a RST segment.
 
 # TCP Socket API
 
-To be able to utilize the networking stack, some kind of an interface has to be provided for applications. The _BSD Socket API_ is the most famous one and it originates from the 4.2BSD UNIX release from 1983.[^tcp-illustrated-implementation] The socket API in Linux is compatible to the BSD Socket API.[^socket-man] 
+To be able to utilize the networking stack, some kind of an interface has to be provided for applications. The _BSD Socket API_ is the most famous one and it originates from the 4.2BSD UNIX release from 1983.[^tcp-illustrated-implementation] The Socket API in Linux is compatible to the BSD Socket API.[^socket-man] 
 
 A socket is reserved from the networking stack by calling `socket(2)`, passing the type of the socket and protocol as parameters. Common values are `AF_INET` for the type and `SOCK_STREAM` as domain. This will default to a TCP-over-IPv4 socket. 
 
@@ -204,7 +204,27 @@ The popular tool `curl` is used to transmit data with a given protocol. We can r
 
 {% highlight bash %}
 
-$ ./lvl-ip curl 10.0.0.5
+$ ./lvl-ip curl example.com 80
+
+...
+<!doctype html>
+<html>
+<head>
+    <title>Example Domain</title>
+
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+<div>
+    <h1>Example Domain</h1>
+    <p>This domain is established to be used for illustrative examples in documents. You may use this
+    domain in examples without prior coordination or asking for permission.</p>
+    <p><a href="http://www.iana.org/domains/example">More information...</a></p>
+</div>
+</body>
+</html>
 
 {% endhighlight %}
 
@@ -216,7 +236,7 @@ We have now essentially implemented a rudimentary TCP with simple data managemen
 
 However, TCP data communication is not a simple problem. The packets can get corrupted, reordered or lost in transit. Furthermore, the data transmit can congest arbitrary elements in the network.
 
-For this, the TCP data communication needs to include more sophisticated logic. In the next post we will look into TCP Window Management and TCP Retransmission Timeout mechanisms, to better cope with more challenging settings.
+For this, the TCP data communication needs to include more sophisticated logic. In the next post, we will look into TCP Window Management and TCP Retransmission Timeout mechanisms, to better cope with more challenging settings.
 
 The source code for the project is hosted at [GitHub](https://github.com/saminiir/level-ip).
 
