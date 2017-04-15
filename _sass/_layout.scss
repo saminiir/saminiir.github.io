@@ -1,8 +1,10 @@
+$font-stack: inconsolata, monospace;
+
 /**
  * Site header
  */
 .site-header {
-    font-family: inconsolata;
+    font-family: $font-stack;
     border-top: 5px solid $grey-color-dark;
     min-height: 56px;
 
@@ -109,7 +111,7 @@
 }
 
 .site-footer .wrapper {
-    font-family: inconsolata;
+    font-family: $font-stack;
     border-top: 1px solid $grey-color-light;
 }
 .footer-col-wrapper {
@@ -176,7 +178,7 @@
 }
 
 .post-list {
-    font-family: inconsolata;
+    font-family: $font-stack;
     margin-left: 0;
     list-style: none;
 
@@ -218,7 +220,7 @@
 }
 
 .post-title {
-    font-family: inconsolata;
+    font-family: $font-stack;
     font-size: 28px;
     letter-spacing: -1px;
     line-height: 1;
