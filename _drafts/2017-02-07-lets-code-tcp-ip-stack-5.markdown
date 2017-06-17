@@ -27,7 +27,7 @@ In ARQ, a receiver sends acknowledgments for data it has received, and the sende
 
 As we have discussed, TCP keeps the sequence numbers of transmitted data in memory and responds with acknowledgments. The transmitted data is put into a retransmission queue and timers associated with the data are started. If no acknowledgment for the sequence of data is received before the timer runs out, a retransmission occurs.
 
-As can be seen, TCP builds its reliability on the principles of ARQ. The detailed implementations of ARQ are, however, very involved. Simple questions like "how long should the sender wait for an acknowledgement?" are tricky to answer, especially when maximum performance is desired. TCP extensions like Selective Acknowledgments (SACK)[^sack] alleviate efficiency problems by acknowledging out-of-order data and avoiding unnecessary round-trips.
+As can be seen, TCP builds its reliability on the principles of ARQ. However, detailed implementations of ARQ are involved. Simple questions like "how long should the sender wait for an acknowledgement?" are tricky to answer, especially when maximum performance is desired. TCP extensions like Selective Acknowledgments (SACK)[^sack] alleviate efficiency problems by acknowledging out-of-order data and avoiding unnecessary round-trips.
 
 # TCP Retransmission
 
@@ -35,15 +35,15 @@ Retransmissions in TCP are described in the original specification[^tcp-spec] as
 
 _When the TCP transmits a segment containing data, it puts a copy on a retransmission queue and starts a timer; when the acknowledgment for that data is received, the segment is deleted from the queue.  If the acknowledgment is not received before the timer runs out, the segment is retransmitted._
 
-However, the original formula for calculating the retransmission timeout was deemed inadequate for operating in different network environments. The current "standard method"[^stevens-tcpip] was described by Jacobson[^cong-avoid] and the latest codified specification can be found from RFC6298[^computing-timer].
+However, the original formula for calculating the retransmission timeout was deemed inadequate for different network environments. The current "standard method"[^stevens-tcpip] was described by Jacobson[^cong-avoid] and the latest codified specification can be found from RFC6298[^computing-timer].
 
 The basic algorithm is relatively straightforward. For a given TCP sender, state variables are defined for calculating the timeout: 
 
-* `rto` holds the actual measured timer length for the retransmission timeout
-* `srtt` is _smoothed round-trip time_ to average the RTT over time
-* `rttvar` is _round-trip time variation_ and is used to estimate the RTT variation
+* `srtt` is _smoothed round-trip time_ for averaging the round-trip time (RTT) of a segment
+* `rttvar` is a _round-trip time variation_ and is used to estimate the RTT variation
+* `rto` eventually holds the _retransmission timeout_, e.g. in milliseconds
 
-In short, `srtt` acts as a low-pass filter for the average RTT. Due to possible large variation in the RTT, `rttvar` is used to detect those changes and prevent them from skewing the averaging function. Additionally, a clock granularity of `G` seconds is assumed.
+In short, `srtt` acts as a low-pass filter for consecutive RTTs. Due to possible large variation in the RTT, `rttvar` is used to detect those changes and prevent them from skewing the averaging function. Additionally, a clock granularity of `G` seconds is assumed.
 
 As described in RFC6298[^computing-timer], the steps for computation are as follows:
 
@@ -70,22 +70,22 @@ rto = srtt + max(g, 4*rttvar)
 
 The clock granularity of TCP implementors has traditionally been estimated to be fairly high, ranging from 500ms to 1 second. Modern systems like Linux, however, use a clock granularity of 1 millisecond[^stevens-tcpip].
 
-One thing to note is the RTO is suggested to always be at least 1 second. This is to guard against _spurious retransmissions_, i.e. when a segment is retransmitted too soon causing congestion. In practice, many implementations go for sub-second rounding: Linux uses 200ms.
+One thing to note is that the RTO is suggested to always be at least 1 second. This is to guard against _spurious retransmissions_, i.e. when a segment is retransmitted too soon causing congestion. In practice, many implementations go for sub-second rounding: Linux uses 200 milliseconds.
 
 # Karn's Algorithm
 
-One mandatory algorithm that prevents the RTT measurement from giving false results is _Karn's Algorithm_[^karns-algorithm]. It simply states that the RTT samples should not be measured for retransmitted packets. 
+One mandatory algorithm that prevents the RTT measurement from giving false results is _Karn's Algorithm_[^karns-algorithm]. It simply states that the RTT samples should not be taken for retransmitted packets. 
 
-In other words, the TCP sender keeps track whether the segment it sent was a retransmission and skips the RTT routine for those acknowledgments. This makes sense, since otherwise the RTO computation could easily be skewed and cause congestion.
+In other words, the TCP sender keeps track whether the segment it sent was a retransmission and skips the RTT routine for those acknowledgments. This makes sense, since otherwise the sender could not distinguish acknowledgements between the original and retransmitted segment.
 
-The timestamp TCP option, however, can be used to measure RTT for every ACK segment. We will deal with the TCP Timestamp option in a separate blog post.
+When utilizing the timestamp TCP option, however, the RTT can be measured for every ACK segment. We will deal with the TCP Timestamp option in a separate blog post.
 
 # Managing the RTO timer
 
 Managing the retransmission timer is relatively straightforward. RFC6298 recommends the following algorithm:
 
 1. When sending a data segment and the RTO timer is not running, activate it with the timeout value of `rto`
-2. When outstanding data segments have been acknowledged, turn off the RTO timer
+2. When all outstanding data segments have been acknowledged, turn off the RTO timer
 3. When an ACK is received for new data, restart the RTO timer with the value of `rto`
 
 And when the RTO timer expires:
@@ -94,7 +94,7 @@ And when the RTO timer expires:
 2. Back off the RTO timer with a factor of 2, i.e. (`rto = rto * 2`)
 3. Start the RTO timer
 
-Additionally, when the backing off of the RTO value occurs and a subsequent measurement is successfully made, the RTO value can shrink drastically. The TCP implementation may clear `srtt` and `rttvar` when backing off and waiting for an acknowledgment.
+Additionally, when the backing off of the RTO value occurs and a subsequent measurement is successfully made, the RTO value can shrink drastically. The TCP implementation may clear `srtt` and `rttvar` when backing off and waiting for an acknowledgment[^computing-timer].
 
 # Signaling retransmission
 
