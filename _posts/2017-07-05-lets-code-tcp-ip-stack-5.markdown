@@ -111,8 +111,8 @@ Let's change the firewall rules to drop packets after the connection is establis
 
 {% highlight bash %}
 $ iptables -I FORWARD --in-interface tap0 \
-	-m connbytes --connbytes 3 --connbytes-dir both \
-	--connbytes-mode packets -j DROP
+	-m conntrack --ctstate ESTABLISHED \
+	-j DROP
 $ ./tools/level-ip curl news.ycombinator.com
 curl: (56) Recv failure: Connection timed out
 {% endhighlight %}
@@ -154,7 +154,7 @@ $ ./tools/level-ip curl -X POST http://httpbin.org/post \
 	-d "payload=$(perl -e "print 'lorem ipsum ' x500")"
 {% endhighlight %}
 
-Let's step through the connection phases, see when retransmissions are triggered and how the RTO value changes. Below is a modified `tcpdump` output with inline comments about the TCP socket's internal state:
+Let's step through the connection phases, see when retransmissions are triggered and how the RTO value changes. Below is a modified `tcpdump` output with inline comments about our TCP socket's internal state:
 
 {% highlight bash %}
 00.000000 10.0.0.4.49951 > httpbin.org.80: [S], seq 1, options [mss 1460]
