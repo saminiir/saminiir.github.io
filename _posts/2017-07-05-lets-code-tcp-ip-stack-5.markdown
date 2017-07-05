@@ -67,7 +67,7 @@ rto = srtt + max(g, 4*rttvar)
 ```
 4. After computing `rto`, if it is less than 1 second, round it up to 1 second. A maximum amount can be provided but it has to be at least 60 seconds
 
-The clock granularity of TCP implementors has traditionally been estimated to be fairly high, ranging from 500ms to 1 second. Modern systems like Linux, however, use a clock granularity of 1 millisecond[^stevens-tcpip].
+The clock granularity of TCP implementations has traditionally been estimated to be fairly high, ranging from 500ms to 1 second. Modern systems like Linux, however, use a clock granularity of 1 millisecond[^stevens-tcpip].
 
 One thing to note is that the RTO is suggested to always be at least 1 second. This is to guard against _spurious retransmissions_, i.e. when a segment is retransmitted too soon, causing congestion in the network. In practice, many implementations go for sub-second rounding: Linux uses 200 milliseconds.
 
