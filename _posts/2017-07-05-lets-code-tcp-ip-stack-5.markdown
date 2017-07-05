@@ -222,7 +222,7 @@ Let's step through the connection phases, see when retransmissions are triggered
 
 # Conclusion
 
-Retransmissions in TCP is an essential part of a robust implementation. A TCP has to survive and be performant in changing network environments, where for example the latencies can suddenly spike or the network path is blocked for a moment.
+Retransmissions in TCP are an essential part of a robust implementation. A TCP has to survive and be performant in changing network environments, where for example the latencies can suddenly spike or the network path is blocked for a moment.
 
 Next time, we will take a look at TCP Congestion Control for achieving maximum performance without degrading the network's health.
 
