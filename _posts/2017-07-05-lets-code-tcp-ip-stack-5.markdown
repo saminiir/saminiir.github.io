@@ -1,9 +1,9 @@
 ---
 layout: post
 title:  "Let's code a TCP/IP stack, 5: TCP Retransmission"
-date:   2017-07-07 10:00:00
+date:   2017-07-05 10:00:00
 categories: [tcp/ip, tutorial, c programming, ip, networking, linux]
-permalink: lets-code-tcp-ip-stack-5-tcp-retransmissionn/
+permalink: lets-code-tcp-ip-stack-5-tcp-retransmission/
 description: "At this point we have a TCP/IP stack that is able to communicate to other hosts in the Internet. The implementation so far has been fairly straight-forward, but missing a major feature: Reliability. Namely, our TCP does not guarantee the integrity of the data stream it presents to applications. Even establishing the connection can fail if the handshake packets are lost in transit. Introducing reliability and control is our next main focus in creating a TCP/IP stack from scratch."
 ---
 
@@ -226,7 +226,7 @@ Retransmissions in TCP is an essential part of a robust implementation. A TCP ha
 
 Next time, we will take a look at TCP Congestion Control for achieving maximum performance without degrading the network's health.
 
-In the meantime, try the project out. See [Getting Started](https://github.com/saminiir/level-ip/blob/master/Documentation/getting-started.md) on how to use it with cURL and Firefox!
+I'd be happy if you try the project out and give feedback. See [Getting Started](https://github.com/saminiir/level-ip/blob/master/Documentation/getting-started.md) on how to use it with cURL and Firefox!
 
 {% include twitter.html %}
 
