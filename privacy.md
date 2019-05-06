@@ -21,4 +21,4 @@ The maintainer of the Site keeps its privacy policy under regular review and pla
 
 # How to contact 
 
-If you have any questions about the Site's privacy policy, please do not hesitate to contact the Site's administrator, <a href="mailto:{{ site.email }}">{{ site.email }}</a>.
+If you have any questions about the Site's privacy policy, please do not hesitate to contact the Site's maintainer, <a href="mailto:{{ site.email }}">{{ site.email }}</a>.
