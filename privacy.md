@@ -7,9 +7,9 @@ permalink: /privacy
 
 The Site "saminiir.com" itself does not collect or analyze personal information.
 
-The Site uses Google Analytics as a third party tracking service. See their [privacy notice](https://policies.google.com/privacy). The service is only used to monitor the usage level and content popularity of the Site. The Site has no access or desire to access personally identifiable information, such as IP addresses.
+The Site uses Google Analytics as a third party tracking service. The service is only used to monitor the usage level and content popularity of the Site. Advertising features are turned off and not used. The Site has no access to personally identifiable information, such as IP addresses. See their [privacy notice](https://policies.google.com/privacy).
 
-The Site is hosted on Github Pages, which may collect personally identifiable information such as IP addresses. See their [privacy notice](https://help.github.com/en/articles/github-privacy-statement#github-pages). The Site has no access or desire to access this information. 
+The Site is hosted on Github Pages, which may collect personally identifiable information such as IP addresses. The Site has no access to this information. See their [privacy notice](https://help.github.com/en/articles/github-privacy-statement#github-pages).
 
 # Privacy policies of other websites
 
@@ -17,7 +17,7 @@ The Site contains links to other websites. This website's privacy policy applies
 
 # Changes to our privacy policy
 
-The maintainer of the Site keeps its privacy policy under regular review and places any updates on this web page. This privacy policy was last updated on 6 May 2019.
+The maintainer of the Site keeps its privacy policy under regular review and places any updates on this web page. This privacy policy was last updated on 7 May 2019.
 
 # How to contact 
 
