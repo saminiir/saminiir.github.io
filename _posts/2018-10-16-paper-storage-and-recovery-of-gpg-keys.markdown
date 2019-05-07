@@ -78,7 +78,7 @@ Then, print this on paper.
 
 Now, what to do when this paper backup is your only option left?
 
-Scan the QR codes from the paper as JPEG, for example.
+Scan the QR codes from the paper as JPEG, for example (EDIT: Actually, do PNG[^png-correction]).
 
 Use `zbarimg` to decode the QR codes as data:
 
@@ -109,3 +109,4 @@ This approach is just one solution for backing up your GPG keys and recovering t
 [^paperkey]:<http://www.jabberwocky.com/software/paperkey/>
 [^qrencode]:<https://github.com/fukuchi/libqrencode>
 [^qr-code-storage]:<https://en.wikipedia.org/wiki/QR_code#Storage>
+[^png-correction]:<https://news.ycombinator.com/item?id=18228408>
