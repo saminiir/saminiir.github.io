@@ -7,7 +7,7 @@ permalink: /privacy
 
 The Site "saminiir.com" itself does not collect or analyze personal information.
 
-The Site uses Google Analytics as a third party tracking service. The service is only used to monitor the usage level and content popularity of the Site. Advertising features are turned off and not used. The Site has no access to personally identifiable information, such as IP addresses. See their [privacy notice](https://policies.google.com/privacy).
+The Site uses Google Analytics as a third party traffic analytics service. The service is only used to monitor the usage level and content popularity of the Site. Advertising features are turned off and not used. The Site has no access to personally identifiable information, such as IP addresses. See their [privacy notice](https://policies.google.com/privacy).
 
 The Site is hosted on Github Pages, which may collect personally identifiable information such as IP addresses. The Site has no access to this information. See their [privacy notice](https://help.github.com/en/articles/github-privacy-statement#github-pages).
 
