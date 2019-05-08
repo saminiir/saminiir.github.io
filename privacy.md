@@ -15,9 +15,9 @@ The Site is hosted on Github Pages, which may collect personally identifiable in
 
 The Site contains links to other websites. This website's privacy policy applies only to it, so if you click on a link to another website, you should read their privacy policy.
 
-# Changes to our privacy policy
+# Changes to the privacy policy
 
-The maintainer of the Site keeps its privacy policy under regular review and places any updates on this web page. This privacy policy was last updated on 7 May 2019.
+The maintainer of the Site keeps its privacy policy under regular review and places any updates on this web page. This privacy policy was last updated on 8 May 2019.
 
 # How to contact 
 
