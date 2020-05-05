@@ -2,7 +2,7 @@
 layout: post
 title:  "Gems from the man page trenches"
 date:   2016-01-17 08:00:00
-categories: cryptography
+categories: humour
 permalink: gems-from-man-page-trenches/
 ---
 
